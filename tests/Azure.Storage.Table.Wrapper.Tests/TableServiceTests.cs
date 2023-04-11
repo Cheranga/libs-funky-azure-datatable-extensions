@@ -8,9 +8,4 @@ using Moq;
 
 namespace Azure.Storage.Table.Wrapper.Tests;
 
-public class TableServiceTests
-{
-    
-
-    
-}
+public class TableServiceTests { }

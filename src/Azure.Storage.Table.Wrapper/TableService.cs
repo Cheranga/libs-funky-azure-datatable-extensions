@@ -19,7 +19,8 @@ internal class TableService : ITableService
         string table,
         T data,
         CancellationToken token
-    ) where T : class, ITableEntity =>
+    )
+        where T : class, ITableEntity =>
         (
             await (
                 from tc in TableClient(_factory, category, table)
@@ -43,7 +44,8 @@ internal class TableService : ITableService
         string table,
         T data,
         CancellationToken token
-    ) where T : class, ITableEntity =>
+    )
+        where T : class, ITableEntity =>
         (
             await (
                 from tc in TableClient(_factory, category, table)
@@ -75,7 +77,8 @@ internal class TableService : ITableService
         string partitionKey,
         string rowKey,
         CancellationToken token
-    ) where T : class, ITableEntity =>
+    )
+        where T : class, ITableEntity =>
         (
             await (
                 from _1 in ValidateEmptyString(category)
@@ -96,7 +99,8 @@ internal class TableService : ITableService
         string table,
         Expression<Func<T, bool>> filter,
         CancellationToken token
-    ) where T : class, ITableEntity =>
+    )
+        where T : class, ITableEntity =>
         (
             await (
                 from tc in TableClient(_factory, category, table)
@@ -123,7 +127,8 @@ internal class TableService : ITableService
         string table,
         T data,
         CancellationToken token
-    ) where T : class, ITableEntity =>
+    )
+        where T : class, ITableEntity =>
         (
             await (
                 from tc in TableClient(_factory, category, table)

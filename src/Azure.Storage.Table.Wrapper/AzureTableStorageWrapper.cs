@@ -33,7 +33,8 @@ internal static class AzureTableStorageWrapper
         T data,
         CancellationToken token,
         bool createNew = true
-    ) where T : ITableEntity =>
+    )
+        where T : ITableEntity =>
         (
             from op in AffMaybe<Response>(
                 async () =>
@@ -58,7 +59,8 @@ internal static class AzureTableStorageWrapper
         string partitionKey,
         string rowKey,
         CancellationToken token
-    ) where T : class, ITableEntity =>
+    )
+        where T : class, ITableEntity =>
         (
             from op in AffMaybe<Response<T>>(
                 async () =>

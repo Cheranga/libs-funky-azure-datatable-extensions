@@ -10,14 +10,16 @@ public interface ITableService
         string table,
         T data,
         CancellationToken token
-    ) where T : class, ITableEntity;
-    
+    )
+        where T : class, ITableEntity;
+
     Task<TableOperation> UpsertAsync<T>(
         string category,
         string table,
         T data,
         CancellationToken token
-    ) where T : class, ITableEntity;
+    )
+        where T : class, ITableEntity;
 
     Task<TableOperation> GetEntityAsync<T>(
         string category,
@@ -25,12 +27,14 @@ public interface ITableService
         string partitionKey,
         string rowKey,
         CancellationToken token
-    ) where T : class, ITableEntity;
+    )
+        where T : class, ITableEntity;
 
     Task<TableOperation> GetEntityListAsync<T>(
         string category,
         string table,
         Expression<Func<T, bool>> filter,
         CancellationToken token
-    ) where T : class, ITableEntity;
+    )
+        where T : class, ITableEntity;
 }
