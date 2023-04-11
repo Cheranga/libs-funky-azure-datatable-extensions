@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Azure.Data.Tables;
 using LanguageExt;
 using LanguageExt.Common;
@@ -6,6 +7,7 @@ using static LanguageExt.Prelude;
 
 namespace Azure.Storage.Table.Wrapper;
 
+[ExcludeFromCodeCoverage]
 internal static class AzureTableStorageWrapper
 {
     public static Eff<TableServiceClient> GetServiceClient(
@@ -26,21 +28,15 @@ internal static class AzureTableStorageWrapper
         (
             from tc in EffMaybe<TableClient>(() => serviceClient.GetTableClient(table))
             select tc
-        ).MapFail(
-            ex =>
-                Error.New(
-                    ErrorCodes.TableUnavailable,
-                    ErrorMessages.TableUnavailable,
-                    ex
-                )
-        );
+        ).MapFail(ex => Error.New(ErrorCodes.TableUnavailable, ErrorMessages.TableUnavailable, ex));
 
     public static Aff<TableOperation> Upsert<T>(
         TableClient client,
         T data,
         CancellationToken token,
         bool createNew = true
-    ) where T : ITableEntity =>
+    )
+        where T : ITableEntity =>
         (
             from op in AffMaybe<Response>(
                 async () =>
@@ -57,10 +53,7 @@ internal static class AzureTableStorageWrapper
             select op
         ).Match(
             _ => TableOperation.Success(),
-            err =>
-                TableOperation.Failure(
-                    Error.New(err.Code, err.Message, err.ToException())
-                )
+            err => TableOperation.Failure(Error.New(err.Code, err.Message, err.ToException()))
         );
 
     public static Aff<TableOperation> GetAsync<T>(
@@ -68,22 +61,20 @@ internal static class AzureTableStorageWrapper
         string partitionKey,
         string rowKey,
         CancellationToken token
-    ) where T : class, ITableEntity =>
+    )
+        where T : class, ITableEntity =>
         (
             from op in AffMaybe<Response<T>>(
                 async () =>
                     await client.GetEntityAsync<T>(partitionKey, rowKey, cancellationToken: token)
             )
-            from _ in guardnot(
+            from _1 in guardnot(
                 op.GetRawResponse().IsError,
                 Error.New(ErrorCodes.EntityDoesNotExist, ErrorMessages.EntityDoesNotExist)
             )
             select op
         ).Match(
             response => TableOperation.GetEntity(response.Value),
-            err =>
-                TableOperation.Failure(
-                    Error.New(err.Code, err.Message, err.ToException())
-                )
+            err => TableOperation.Failure(Error.New(err.Code, err.Message, err.ToException()))
         );
 }

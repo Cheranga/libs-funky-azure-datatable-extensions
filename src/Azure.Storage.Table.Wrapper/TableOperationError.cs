@@ -14,7 +14,8 @@ public record TableOperationError : Error
 {
     // public TableOperationException Exception { get; }
 
-    private TableOperationError(Error error) : base(error)
+    private TableOperationError(Error error)
+        : base(error)
     {
         Message = error.Message;
     }
@@ -28,8 +29,7 @@ public record TableOperationError : Error
 
     public override bool Is<E>() => true;
 
-    public override ErrorException ToErrorException() =>
-        ErrorException.New(ToException());
+    public override ErrorException ToErrorException() => ErrorException.New(ToException());
 
     // public static TableOperationError New(
     //     int errorCode,

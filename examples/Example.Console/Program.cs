@@ -11,7 +11,8 @@ var host = Host.CreateDefaultBuilder()
     })
     .Build();
 
-var tableService = host.Services.GetRequiredService<ITableService>();
+var queryService = host.Services.GetRequiredService<IQueryService>();
+var commandService = host.Services.GetRequiredService<ICommandService>();
 
 await AddProductAsync();
 await GetProductAsync();
@@ -24,7 +25,7 @@ async Task GetProductListAsync()
         .ToSeq()
         .SequenceParallel(
             x =>
-                tableService.UpsertAsync(
+                commandService.UpsertAsync(
                     "ProductsDomain",
                     "products",
                     ProductDataModel.New("TECH", x.ToString(), x),
@@ -32,7 +33,7 @@ async Task GetProductListAsync()
                 )
         );
 
-    var op = await tableService.GetEntityListAsync<ProductDataModel>(
+    var op = await queryService.GetEntityListAsync<ProductDataModel>(
         "ProductsDomain",
         "products",
         x => x.Category == "TECH",
@@ -53,14 +54,14 @@ async Task GetProductListAsync()
 async Task GetProductAsync()
 {
     var productDataModel = ProductDataModel.New("TECH", "PROD1", 259.99d);
-    var _ = await tableService.UpsertAsync(
+    var _ = await commandService.UpsertAsync(
         "ProductsDomain",
         "products",
         productDataModel,
         new CancellationToken()
     );
 
-    var op = await tableService.GetEntityAsync<ProductDataModel>(
+    var op = await queryService.GetEntityAsync<ProductDataModel>(
         "ProductsDomain",
         "products",
         "TECH",
@@ -82,7 +83,7 @@ async Task GetProductAsync()
 async Task AddProductAsync()
 {
     var productDataModel = ProductDataModel.New("TECH", "PROD1", 259.99d);
-    var op = await tableService.UpsertAsync(
+    var op = await commandService.UpsertAsync(
         "ProductsDomain",
         "products",
         productDataModel,

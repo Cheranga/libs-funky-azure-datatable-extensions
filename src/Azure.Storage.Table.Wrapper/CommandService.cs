@@ -1,18 +1,20 @@
-using System.Linq.Expressions;
-using Azure.Data.Tables;
+﻿using Azure.Data.Tables;
+using Microsoft.Extensions.Azure;
 using LanguageExt;
 using LanguageExt.Common;
-using Microsoft.Extensions.Azure;
 using static LanguageExt.Prelude;
 using static Azure.Storage.Table.Wrapper.AzureTableStorageWrapper;
 
 namespace Azure.Storage.Table.Wrapper;
 
-internal class TableService : ITableService
+public class CommandService : ICommandService
 {
     private readonly IAzureClientFactory<TableServiceClient> _factory;
 
-    public TableService(IAzureClientFactory<TableServiceClient> factory) => _factory = factory;
+    public CommandService(IAzureClientFactory<TableServiceClient> factory)
+    {
+        _factory = factory;
+    }
 
     public async Task<TableOperation> UpsertAsync<T>(
         string category,
@@ -43,75 +45,6 @@ internal class TableService : ITableService
             ).Run()
         ).Match(
             _ => TableOperation.Success(),
-            err => TableOperation.Failure(Error.New(err.Code, err.Message, err.ToException()))
-        );
-
-    public async Task<TableOperation> GetEntityAsync<T>(
-        string category,
-        string table,
-        string partitionKey,
-        string rowKey,
-        CancellationToken token
-    )
-        where T : class, ITableEntity =>
-        (
-            await (
-                from _1 in ValidateEmptyString(
-                    category,
-                    ErrorCodes.Invalid,
-                    ErrorMessages.EmptyOrNull
-                )
-                from _2 in ValidateEmptyString(table, ErrorCodes.Invalid, ErrorMessages.EmptyOrNull)
-                from _3 in ValidateEmptyString(
-                    partitionKey,
-                    ErrorCodes.Invalid,
-                    ErrorMessages.EmptyOrNull
-                )
-                from _4 in ValidateEmptyString(
-                    rowKey,
-                    ErrorCodes.Invalid,
-                    ErrorMessages.EmptyOrNull
-                )
-                from tc in TableClient(_factory, category, table)
-                from op in GetAsync<T>(tc, partitionKey, rowKey, token)
-                select op
-            ).Run()
-        ).Match(
-            operation => operation,
-            err => TableOperation.Failure(Error.New(err.Code, err.Message, err.ToException()))
-        );
-
-    public async Task<TableOperation> GetEntityListAsync<T>(
-        string category,
-        string table,
-        Expression<Func<T, bool>> filter,
-        CancellationToken token
-    )
-        where T : class, ITableEntity =>
-        (
-            await (
-                from _1 in ValidateEmptyString(
-                    category,
-                    ErrorCodes.Invalid,
-                    ErrorMessages.EmptyOrNull
-                )
-                from _2 in ValidateEmptyString(table, ErrorCodes.Invalid, ErrorMessages.EmptyOrNull)
-                from tc in TableClient(_factory, category, table)
-                from records in Aff(
-                    async () =>
-                        await tc.QueryAsync<T>(filter, cancellationToken: token).ToListAsync(token)
-                )
-                from _3 in guard(
-                    records.Any(),
-                    Error.New(
-                        ErrorCodes.EntityListDoesNotExist,
-                        ErrorMessages.EntityListDoesNotExist
-                    )
-                )
-                select records
-            ).Run()
-        ).Match(
-            TableOperation.GetEntities,
             err => TableOperation.Failure(Error.New(err.Code, err.Message, err.ToException()))
         );
 

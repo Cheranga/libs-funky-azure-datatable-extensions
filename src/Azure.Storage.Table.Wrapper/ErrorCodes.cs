@@ -9,6 +9,7 @@ public static class ErrorCodes
     public const int Invalid = 504;
     public const int CannotInsert = 505;
     public const int CannotUpdate = 506;
+    public const int EntityListDoesNotExist = 507;
 }
 
 public static class ErrorMessages
@@ -21,4 +22,6 @@ public static class ErrorMessages
     public const string Invalid = "invalid";
     public const string CannotInsert = "error occurred when inserting entity to table";
     public const string CannotUpdate = "error occurred when updating entity to table";
+    public const string EntityListDoesNotExist = "entities does not exist";
+    public const string EmptyOrNull = "empty or null";
 }

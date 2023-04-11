@@ -1,9 +1,11 @@
+using System.Diagnostics.CodeAnalysis;
 using Azure.Identity;
 using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Azure.Storage.Table.Wrapper;
 
+[ExcludeFromCodeCoverage]
 public static class Bootstrapper
 {
     public static void RegisterTablesWithConnectionString(
@@ -17,7 +19,8 @@ public static class Bootstrapper
             builder.AddTableServiceClient(connectionstring).WithName(name);
         });
 
-        services.AddSingleton<ITableService, TableService>();
+        services.AddSingleton<IQueryService, QueryService>();
+        services.AddSingleton<ICommandService, CommandService>();
     }
 
     public static void RegisterTablesWithManagedIdentity(
@@ -34,6 +37,7 @@ public static class Bootstrapper
                 .WithCredential(new ManagedIdentityCredential());
         });
 
-        services.AddSingleton<ITableService, TableService>();
+        services.AddSingleton<IQueryService, QueryService>();
+        services.AddSingleton<ICommandService, CommandService>();
     }
 }
