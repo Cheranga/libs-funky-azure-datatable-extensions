@@ -4,13 +4,6 @@ using Azure.Data.Tables;
 
 namespace Azure.Storage.Table.Wrapper.Tests;
 
-public class TestTableClient : TableClient { }
-
-public class TestTableServiceClient : TableServiceClient
-{
-    public override TableClient GetTableClient(string tableName) => new TestTableClient();
-}
-
 public class TestResponse : Response
 {
     private TestResponse(HttpStatusCode statusCode)

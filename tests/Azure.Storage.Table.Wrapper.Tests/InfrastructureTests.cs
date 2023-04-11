@@ -11,7 +11,7 @@ public static class InfrastructureTests
     public static async Task UnregisteredTableService()
     {
         var factory = new Mock<IAzureClientFactory<TableServiceClient>>();
-        var tableService = new TableService(factory.Object);
+        var tableService = new QueryService(factory.Object);
         var op = await tableService.GetEntityAsync<ProductDataModel>(
             "test",
             "products",
@@ -35,7 +35,7 @@ public static class InfrastructureTests
         var factory = new Mock<IAzureClientFactory<TableServiceClient>>();
         factory.Setup(x => x.CreateClient("test")).Returns(tableServiceClient.Object);
 
-        var tableService = new TableService(factory.Object);
+        var tableService = new QueryService(factory.Object);
         var op = await tableService.GetEntityAsync<ProductDataModel>(
             "test",
             "products",

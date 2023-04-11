@@ -17,6 +17,7 @@
 
     <ItemGroup>
       <Compile Remove="TableOperationError.cs" />
+      <Compile Remove="TableService.cs" />
     </ItemGroup>
 
     <ItemGroup>

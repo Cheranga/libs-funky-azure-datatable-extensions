@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Azure.Data.Tables;
 using LanguageExt;
 using LanguageExt.Common;
@@ -6,6 +7,7 @@ using static LanguageExt.Prelude;
 
 namespace Azure.Storage.Table.Wrapper;
 
+[ExcludeFromCodeCoverage]
 internal static class AzureTableStorageWrapper
 {
     public static Eff<TableServiceClient> GetServiceClient(

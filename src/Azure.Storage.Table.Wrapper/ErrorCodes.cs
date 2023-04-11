@@ -23,4 +23,5 @@ public static class ErrorMessages
     public const string CannotInsert = "error occurred when inserting entity to table";
     public const string CannotUpdate = "error occurred when updating entity to table";
     public const string EntityListDoesNotExist = "entities does not exist";
+    public const string EmptyOrNull = "empty or null";
 }

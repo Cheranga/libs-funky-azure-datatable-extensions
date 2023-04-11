@@ -30,7 +30,7 @@ public static class QueryTests
 
         var factory = new Mock<IAzureClientFactory<TableServiceClient>>();
         factory.Setup(x => x.CreateClient("test")).Returns(tableServiceClient.Object);
-        var tableService = new TableService(factory.Object);
+        var tableService = new QueryService(factory.Object);
         var op = await tableService.GetEntityAsync<ProductDataModel>(
             "test",
             "products",
@@ -67,7 +67,7 @@ public static class QueryTests
 
         var factory = new Mock<IAzureClientFactory<TableServiceClient>>();
         factory.Setup(x => x.CreateClient("test")).Returns(tableServiceClient.Object);
-        var tableService = new TableService(factory.Object);
+        var tableService = new QueryService(factory.Object);
         var op = await tableService.GetEntityAsync<ProductDataModel>(
             "test",
             "products",
@@ -117,7 +117,7 @@ public static class QueryTests
 
         var factory = new Mock<IAzureClientFactory<TableServiceClient>>();
         factory.Setup(x => x.CreateClient("test")).Returns(tableServiceClient.Object);
-        var tableService = new TableService(factory.Object);
+        var tableService = new QueryService(factory.Object);
         var op = await tableService.GetEntityListAsync<ProductDataModel>(
             "test",
             "products",
@@ -155,7 +155,7 @@ public static class QueryTests
 
         var factory = new Mock<IAzureClientFactory<TableServiceClient>>();
         factory.Setup(x => x.CreateClient("test")).Returns(tableServiceClient.Object);
-        var tableService = new TableService(factory.Object);
+        var tableService = new QueryService(factory.Object);
         var op = await tableService.GetEntityListAsync<ProductDataModel>(
             "test",
             "products",
@@ -166,5 +166,33 @@ public static class QueryTests
         var failedOp = op as TableOperation.FailedOperation;
         failedOp.Should().NotBeNull();
         failedOp!.Error.Code.Should().Be(ErrorCodes.EntityListDoesNotExist);
+    }
+
+    [Theory(DisplayName = "Invalid category or table")]
+    [InlineData("", "")]
+    [InlineData("", null)]
+    [InlineData(null, "")]
+    [InlineData(null, null)]
+    public static async Task InvalidCategoryAndTable(string category, string table)
+    {
+        var tableServiceClient = new Mock<TableServiceClient>();
+        tableServiceClient
+            .Setup(x => x.GetTableClient("products"))
+            .Throws(new Exception("table not found"));
+        var factory = new Mock<IAzureClientFactory<TableServiceClient>>();
+        factory.Setup(x => x.CreateClient("test")).Returns(tableServiceClient.Object);
+
+        var tableService = new QueryService(factory.Object);
+        var op = await tableService.GetEntityAsync<ProductDataModel>(
+            category,
+            table,
+            "tech",
+            "prod1",
+            new CancellationToken()
+        );
+        var failedOp = op as TableOperation.FailedOperation;
+        failedOp.Should().NotBeNull();
+        failedOp.Error.Code.Should().Be(ErrorCodes.Invalid);
+        failedOp.Error.Message.Should().Be(ErrorMessages.EmptyOrNull);
     }
 }
