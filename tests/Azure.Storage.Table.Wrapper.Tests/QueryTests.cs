@@ -77,8 +77,8 @@ public static class QueryTests
         );
 
         var failedOp = op as TableOperation.FailedOperation;
-        failedOp.Should().NotBeNull();
-        failedOp.Error.Code.Should().Be(ErrorCodes.EntityDoesNotExist);
+        failedOp!.Should().NotBeNull();
+        failedOp!.Error.Code.Should().Be(ErrorCodes.EntityDoesNotExist);
     }
 
     [Fact(DisplayName = "Filter returns entities")]
@@ -192,7 +192,7 @@ public static class QueryTests
         );
         var failedOp = op as TableOperation.FailedOperation;
         failedOp.Should().NotBeNull();
-        failedOp.Error.Code.Should().Be(ErrorCodes.Invalid);
-        failedOp.Error.Message.Should().Be(ErrorMessages.EmptyOrNull);
+        failedOp!.Error.Code.Should().Be(ErrorCodes.Invalid);
+        failedOp!.Error.Message.Should().Be(ErrorMessages.EmptyOrNull);
     }
 }

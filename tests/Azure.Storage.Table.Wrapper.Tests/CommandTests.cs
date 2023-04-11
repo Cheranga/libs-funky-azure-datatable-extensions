@@ -37,7 +37,7 @@ public static class CommandTests
 
         var failedOp = op as TableOperation.FailedOperation;
         failedOp.Should().NotBeNull();
-        failedOp.Error.Code.Should().Be(ErrorCodes.CannotUpsert);
+        failedOp!.Error.Code.Should().Be(ErrorCodes.CannotUpsert);
         failedOp.Error.Message.Should().Be("upsert failure");
     }
 
