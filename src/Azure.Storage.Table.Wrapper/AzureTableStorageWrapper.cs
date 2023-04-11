@@ -26,14 +26,7 @@ internal static class AzureTableStorageWrapper
         (
             from tc in EffMaybe<TableClient>(() => serviceClient.GetTableClient(table))
             select tc
-        ).MapFail(
-            ex =>
-                Error.New(
-                    ErrorCodes.TableUnavailable,
-                    ErrorMessages.TableUnavailable,
-                    ex
-                )
-        );
+        ).MapFail(ex => Error.New(ErrorCodes.TableUnavailable, ErrorMessages.TableUnavailable, ex));
 
     public static Aff<TableOperation> Upsert<T>(
         TableClient client,
@@ -57,10 +50,7 @@ internal static class AzureTableStorageWrapper
             select op
         ).Match(
             _ => TableOperation.Success(),
-            err =>
-                TableOperation.Failure(
-                    Error.New(err.Code, err.Message, err.ToException())
-                )
+            err => TableOperation.Failure(Error.New(err.Code, err.Message, err.ToException()))
         );
 
     public static Aff<TableOperation> GetAsync<T>(
@@ -74,16 +64,13 @@ internal static class AzureTableStorageWrapper
                 async () =>
                     await client.GetEntityAsync<T>(partitionKey, rowKey, cancellationToken: token)
             )
-            from _ in guardnot(
+            from _1 in guardnot(
                 op.GetRawResponse().IsError,
                 Error.New(ErrorCodes.EntityDoesNotExist, ErrorMessages.EntityDoesNotExist)
             )
             select op
         ).Match(
             response => TableOperation.GetEntity(response.Value),
-            err =>
-                TableOperation.Failure(
-                    Error.New(err.Code, err.Message, err.ToException())
-                )
+            err => TableOperation.Failure(Error.New(err.Code, err.Message, err.ToException()))
         );
 }

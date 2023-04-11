@@ -88,10 +88,7 @@ internal class TableService : ITableService
             ).Run()
         ).Match(
             operation => operation,
-            err =>
-                TableOperation.Failure(
-                    Error.New(err.Code, err.Message, err.ToException())
-                )
+            err => TableOperation.Failure(Error.New(err.Code, err.Message, err.ToException()))
         );
 
     public async Task<TableOperation> GetEntityListAsync<T>(
@@ -103,15 +100,22 @@ internal class TableService : ITableService
         (
             await (
                 from tc in TableClient(_factory, category, table)
-                from records in Aff(async () => await tc.QueryAsync<T>(filter).ToListAsync(token))
+                from records in Aff(
+                    async () =>
+                        await tc.QueryAsync<T>(filter, cancellationToken: token).ToListAsync(token)
+                )
+                from _1 in guard(
+                    records.Any(),
+                    Error.New(
+                        ErrorCodes.EntityListDoesNotExist,
+                        ErrorMessages.EntityListDoesNotExist
+                    )
+                )
                 select records
             ).Run()
         ).Match(
             TableOperation.GetEntities,
-            err =>
-                TableOperation.Failure(
-                    Error.New(err.Code, err.Message, err.ToException())
-                )
+            err => TableOperation.Failure(Error.New(err.Code, err.Message, err.ToException()))
         );
 
     public async Task<TableOperation> UpdateAsync<T>(
@@ -134,10 +138,7 @@ internal class TableService : ITableService
             ).Run()
         ).Match(
             _ => TableOperation.Success(),
-            err =>
-                TableOperation.Failure(
-                    Error.New(err.Code, err.Message, err.ToException())
-                )
+            err => TableOperation.Failure(Error.New(err.Code, err.Message, err.ToException()))
         );
 
     private static Eff<Unit> ValidateEmptyString(string s) =>
