@@ -1,0 +1,59 @@
+using System.Diagnostics.CodeAnalysis;
+using Azure.Data.Tables;
+using LanguageExt.Common;
+
+namespace Azure.Storage.Table.Wrapper;
+
+[ExcludeFromCodeCoverage]
+public abstract class QueryOperation
+{
+    public static QueryOperation Fail(Error error) => QueryFailedOperation.New(error);
+
+    public static QueryOperation Empty() => EmptyResult.New();
+
+    public static QueryOperation Single<T>(T data)
+        where T : class, ITableEntity => SingleResult<T>.New(data);
+
+    public static QueryOperation Collection<T>(IEnumerable<T> data)
+        where T : class, ITableEntity => CollectionResult<T>.New(data);
+
+    public sealed class EmptyResult : QueryOperation
+    {
+        private EmptyResult() { }
+
+        public static EmptyResult New() => new();
+    }
+
+    public sealed class SingleResult<T> : QueryOperation
+        where T : class, ITableEntity
+    {
+        private SingleResult(T entity) => Entity = entity;
+
+        public T Entity { get; }
+
+        public static SingleResult<T> New(T data) => new(data);
+    }
+
+    public sealed class CollectionResult<T> : QueryOperation
+        where T : class, ITableEntity
+    {
+        private CollectionResult(IEnumerable<T> entities) =>
+            Entities = entities?.ToList() ?? new List<T>();
+
+        public List<T> Entities { get; }
+
+        public static CollectionResult<T> New(IEnumerable<T> data) => new(data);
+    }
+
+    public sealed class QueryFailedOperation : QueryOperation
+    {
+        public Error Error { get; }
+
+        private QueryFailedOperation(Error error)
+        {
+            Error = error;
+        }
+
+        public static QueryOperation New(Error error) => new QueryFailedOperation(error);
+    }
+}

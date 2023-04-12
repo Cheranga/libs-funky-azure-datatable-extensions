@@ -4,7 +4,6 @@ using LanguageExt;
 using LanguageExt.Common;
 using static LanguageExt.Prelude;
 using static Azure.Storage.Table.Wrapper.AzureTableStorageWrapper;
-using static Azure.Storage.Table.Wrapper.TableOperation;
 
 namespace Azure.Storage.Table.Wrapper;
 

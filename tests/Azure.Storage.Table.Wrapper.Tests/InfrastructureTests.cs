@@ -2,7 +2,6 @@
 using FluentAssertions;
 using Microsoft.Extensions.Azure;
 using Moq;
-using static Azure.Storage.Table.Wrapper.TableOperation;
 
 namespace Azure.Storage.Table.Wrapper.Tests;
 

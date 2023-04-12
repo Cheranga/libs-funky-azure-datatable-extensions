@@ -3,7 +3,6 @@ using Example.Console;
 using LanguageExt;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using static Azure.Storage.Table.Wrapper.TableOperation;
 
 var host = Host.CreateDefaultBuilder()
     .ConfigureServices(services =>

@@ -2,7 +2,6 @@
 using FluentAssertions;
 using Microsoft.Extensions.Azure;
 using Moq;
-using static Azure.Storage.Table.Wrapper.TableOperation;
 
 namespace Azure.Storage.Table.Wrapper.Tests;
 
@@ -70,7 +69,7 @@ public static class CommandTests
             new CancellationToken()
         );
 
-        var succOp = op as TableOperation.CommandOperation;
+        var succOp = op as CommandOperation.CommandSuccessOperation;
         succOp.Should().NotBeNull();
     }
 
@@ -102,7 +101,7 @@ public static class CommandTests
             new CancellationToken()
         );
 
-        var succOp = op as TableOperation.CommandOperation;
+        var succOp = op as CommandOperation.CommandSuccessOperation;
         succOp.Should().NotBeNull();
     }
 
