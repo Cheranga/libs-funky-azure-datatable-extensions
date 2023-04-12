@@ -16,18 +16,22 @@ public abstract class CommandOperation
     {
         private CommandSuccessOperation() { }
 
-        public static CommandOperation New() => new CommandSuccessOperation();
+        internal static CommandOperation New() => new CommandSuccessOperation();
     }
 
     public sealed class CommandFailedOperation : CommandOperation
     {
-        public Error Error { get; }
+        public int ErrorCode { get; }
+        public string ErrorMessage { get; }
+        public Exception? Exception { get; }
 
         private CommandFailedOperation(Error error)
         {
-            Error = error;
+            ErrorCode = error.Code;
+            ErrorMessage = error.Message;
+            Exception = error.ToException();
         }
 
-        public static CommandOperation New(Error error) => new CommandFailedOperation(error);
+        internal static CommandOperation New(Error error) => new CommandFailedOperation(error);
     }
 }

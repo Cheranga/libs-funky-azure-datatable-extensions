@@ -21,7 +21,7 @@ public abstract class QueryOperation
     {
         private EmptyResult() { }
 
-        public static EmptyResult New() => new();
+        internal static EmptyResult New() => new();
     }
 
     public sealed class SingleResult<T> : QueryOperation
@@ -31,7 +31,7 @@ public abstract class QueryOperation
 
         public T Entity { get; }
 
-        public static SingleResult<T> New(T data) => new(data);
+        internal static SingleResult<T> New(T data) => new(data);
     }
 
     public sealed class CollectionResult<T> : QueryOperation
@@ -42,18 +42,22 @@ public abstract class QueryOperation
 
         public List<T> Entities { get; }
 
-        public static CollectionResult<T> New(IEnumerable<T> data) => new(data);
+        internal static CollectionResult<T> New(IEnumerable<T> data) => new(data);
     }
 
     public sealed class QueryFailedOperation : QueryOperation
     {
-        public Error Error { get; }
+        public int ErrorCode { get; }
+        public string ErrorMessage { get; }
+        public Exception? Exception { get; }
 
         private QueryFailedOperation(Error error)
         {
-            Error = error;
+            ErrorCode = error.Code;
+            ErrorMessage = error.Message;
+            Exception = error.ToException();
         }
 
-        public static QueryOperation New(Error error) => new QueryFailedOperation(error);
+        internal static QueryOperation New(Error error) => new QueryFailedOperation(error);
     }
 }

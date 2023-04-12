@@ -1,6 +1,5 @@
 ﻿using Azure.Storage.Table.Wrapper;
 using Example.Console;
-using LanguageExt;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -20,18 +19,19 @@ await GetProductListAsync();
 
 async Task GetProductListAsync()
 {
-    var _ = await Enumerable
-        .Range(1, 10)
-        .ToSeq()
-        .SequenceParallel(
-            x =>
-                commandService.UpsertAsync(
-                    "ProductsDomain",
-                    "products",
-                    ProductDataModel.New("TECH", x.ToString(), x),
-                    new CancellationToken()
-                )
-        );
+    await Task.WhenAll(
+        Enumerable
+            .Range(1, 10)
+            .Select(
+                x =>
+                    commandService.UpsertAsync(
+                        "ProductsDomain",
+                        "products",
+                        ProductDataModel.New("TECH", x.ToString(), x),
+                        new CancellationToken()
+                    )
+            )
+    );
 
     var op = await queryService.GetEntityListAsync<ProductDataModel>(
         "ProductsDomain",
@@ -45,7 +45,7 @@ async Task GetProductListAsync()
         {
             QueryOperation.CollectionResult<ProductDataModel> products
                 => $"found {products.Entities.Count} items",
-            QueryOperation.QueryFailedOperation f => $"{f.Error.Code} with {f.Error.Message}",
+            QueryOperation.QueryFailedOperation f => $"{f.ErrorCode} with {f.ErrorMessage}",
             _ => "unsupported"
         }
     );
@@ -74,7 +74,7 @@ async Task GetProductAsync()
             QueryOperation.SingleResult<ProductDataModel> r
                 => $"{r.Entity.Category}:{r.Entity.Id}:{r.Entity.Price}",
             QueryOperation.QueryFailedOperation f
-                => $"{f.Error.Code}:{f.Error.Message}:{f.Error.ToException()}",
+                => $"{f.ErrorCode}:{f.ErrorMessage}:{f.Exception}",
             _ => "unsupported"
         }
     );
@@ -95,7 +95,7 @@ async Task AddProductAsync()
         {
             CommandOperation.CommandSuccessOperation _ => "successfully upserted",
             CommandOperation.CommandFailedOperation f
-                => $"{f.Error.Code}:{f.Error.Message}:{f.Error.ToException()}",
+                => $"{f.ErrorCode}:{f.ErrorMessage}:{f.Exception}",
             _ => "unsupported"
         }
     );

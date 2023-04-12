@@ -78,10 +78,10 @@ public static class QueryTests
 
         var failedOp = op as QueryOperation.QueryFailedOperation;
         failedOp!.Should().NotBeNull();
-        failedOp!.Error.Code.Should().Be(ErrorCodes.EntityDoesNotExist);
+        failedOp!.ErrorCode.Should().Be(ErrorCodes.EntityDoesNotExist);
     }
 
-    [Fact(DisplayName = "Filter returns entities")]
+    [Fact(DisplayName = "Filter returns a collection of entities")]
     public static async Task FilterReturnsEntities()
     {
         var tableClient = new Mock<TableClient>();
@@ -128,6 +128,132 @@ public static class QueryTests
         var succOp = op as QueryOperation.CollectionResult<ProductDataModel>;
         succOp.Should().NotBeNull();
         succOp!.Entities.Count.Should().Be(2);
+    }
+
+    [Fact(DisplayName = "Filter returns a single entity")]
+    public static async Task FilterReturnsSingleEntity()
+    {
+        var tableClient = new Mock<TableClient>();
+        tableClient
+            .Setup(
+                x =>
+                    x.QueryAsync<ProductDataModel>(
+                        x => x.Category == "TECH",
+                        It.IsAny<int?>(),
+                        It.IsAny<IEnumerable<string>>(),
+                        It.IsAny<CancellationToken>()
+                    )
+            )
+            .Returns(
+                AsyncPageable<ProductDataModel>.FromPages(
+                    new[]
+                    {
+                        Page<ProductDataModel>.FromValues(
+                            new[] { ProductDataModel.New("TECH", "PROD1", 100) },
+                            It.IsAny<string>(),
+                            It.IsAny<Response>()
+                        )
+                    }
+                )
+            );
+
+        var tableServiceClient = new Mock<TableServiceClient>();
+        tableServiceClient.Setup(x => x.GetTableClient("products")).Returns(tableClient.Object);
+
+        var factory = new Mock<IAzureClientFactory<TableServiceClient>>();
+        factory.Setup(x => x.CreateClient("test")).Returns(tableServiceClient.Object);
+        var tableService = new QueryService(factory.Object);
+        var op = await tableService.GetEntityListAsync<ProductDataModel>(
+            "test",
+            "products",
+            x => x.Category == "TECH",
+            new CancellationToken()
+        );
+
+        var succOp = op as QueryOperation.SingleResult<ProductDataModel>;
+        succOp.Should().NotBeNull();
+        succOp!.Entity.Category.Should().Be("TECH");
+        succOp.Entity.Id.Should().Be("PROD1");
+        succOp.Entity.Price.Should().Be(100);
+    }
+
+    [Fact(DisplayName = "Filter returns empty")]
+    public static async Task FilterReturnsEmptyResult()
+    {
+        var tableClient = new Mock<TableClient>();
+        tableClient
+            .Setup(
+                x =>
+                    x.QueryAsync<ProductDataModel>(
+                        x => x.Category == "TECH",
+                        It.IsAny<int?>(),
+                        It.IsAny<IEnumerable<string>>(),
+                        It.IsAny<CancellationToken>()
+                    )
+            )
+            .Returns(
+                AsyncPageable<ProductDataModel>.FromPages(
+                    new[]
+                    {
+                        Page<ProductDataModel>.FromValues(
+                            Array.Empty<ProductDataModel>(),
+                            It.IsAny<string>(),
+                            It.IsAny<Response>()
+                        )
+                    }
+                )
+            );
+
+        var tableServiceClient = new Mock<TableServiceClient>();
+        tableServiceClient.Setup(x => x.GetTableClient("products")).Returns(tableClient.Object);
+
+        var factory = new Mock<IAzureClientFactory<TableServiceClient>>();
+        factory.Setup(x => x.CreateClient("test")).Returns(tableServiceClient.Object);
+        var tableService = new QueryService(factory.Object);
+        var op = await tableService.GetEntityListAsync<ProductDataModel>(
+            "test",
+            "products",
+            x => x.Category == "TECH",
+            new CancellationToken()
+        );
+
+        var succOp = op as QueryOperation.EmptyResult;
+        succOp.Should().NotBeNull();
+    }
+
+    [Fact(DisplayName = "Filter throws error")]
+    public static async Task FilterThrowsError()
+    {
+        var tableClient = new Mock<TableClient>();
+        tableClient
+            .Setup(
+                x =>
+                    x.QueryAsync<ProductDataModel>(
+                        x => x.Category == "TECH",
+                        It.IsAny<int?>(),
+                        It.IsAny<IEnumerable<string>>(),
+                        It.IsAny<CancellationToken>()
+                    )
+            )
+            .Throws(new RequestFailedException(TestResponse.Fail("error occurred")));
+
+        var tableServiceClient = new Mock<TableServiceClient>();
+        tableServiceClient.Setup(x => x.GetTableClient("products")).Returns(tableClient.Object);
+
+        var factory = new Mock<IAzureClientFactory<TableServiceClient>>();
+        factory.Setup(x => x.CreateClient("test")).Returns(tableServiceClient.Object);
+        var tableService = new QueryService(factory.Object);
+        var op = await tableService.GetEntityListAsync<ProductDataModel>(
+            "test",
+            "products",
+            x => x.Category == "TECH",
+            new CancellationToken()
+        );
+
+        var failedOp = op as QueryOperation.QueryFailedOperation;
+        failedOp.Should().NotBeNull();
+        failedOp!.ErrorCode.Should().Be(ErrorCodes.CannotGetDataFromTable);
+        failedOp.ErrorMessage.Should().Be(ErrorMessages.CannotGetDataFromTable);
     }
 
     [Fact(DisplayName = "Filter does not return entities")]
@@ -191,7 +317,7 @@ public static class QueryTests
         );
         var failedOp = op as QueryOperation.QueryFailedOperation;
         failedOp.Should().NotBeNull();
-        failedOp!.Error.Code.Should().Be(ErrorCodes.Invalid);
-        failedOp!.Error.Message.Should().Be(ErrorMessages.EmptyOrNull);
+        failedOp!.ErrorCode.Should().Be(ErrorCodes.Invalid);
+        failedOp!.ErrorMessage.Should().Be(ErrorMessages.EmptyOrNull);
     }
 }

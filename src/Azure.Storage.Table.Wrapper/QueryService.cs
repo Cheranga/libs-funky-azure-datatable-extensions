@@ -74,24 +74,24 @@ internal class QueryService : IQueryService
                     async () =>
                         await tc.QueryAsync<T>(filter, cancellationToken: token).ToListAsync(token)
                 )
-                from _3 in guard(
-                    records.Any(),
-                    Error.New(
-                        ErrorCodes.EntityListDoesNotExist,
-                        ErrorMessages.EntityListDoesNotExist
-                    )
-                )
-                select records
+                select records?.ToList() ?? new List<T>()
             ).Run()
         ).Match(
             items =>
-                items.Count == 1
-                    ? QueryOperation.Single(items.First())
-                    : QueryOperation.Collection(items),
+                items.Count switch
+                {
+                    0 => QueryOperation.Empty(),
+                    1 => QueryOperation.Single(items.First()),
+                    _ => QueryOperation.Collection(items)
+                },
             err =>
-                err.Code == ErrorCodes.EntityListDoesNotExist
-                    ? QueryOperation.Empty()
-                    : QueryOperation.Fail(err)
+                QueryOperation.Fail(
+                    Error.New(
+                        ErrorCodes.CannotGetDataFromTable,
+                        ErrorMessages.CannotGetDataFromTable,
+                        err.ToException()
+                    )
+                )
         );
 
     private static Eff<TableClient> TableClient(

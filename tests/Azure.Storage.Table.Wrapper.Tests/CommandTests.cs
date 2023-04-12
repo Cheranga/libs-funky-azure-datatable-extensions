@@ -22,13 +22,13 @@ public static class CommandTests
             )
             .ReturnsAsync(TestResponse.Fail("upsert failure"));
 
-        var CommandServiceClient = new Mock<TableServiceClient>();
-        CommandServiceClient.Setup(x => x.GetTableClient("products")).Returns(tableClient.Object);
+        var commandServiceClient = new Mock<TableServiceClient>();
+        commandServiceClient.Setup(x => x.GetTableClient("products")).Returns(tableClient.Object);
 
         var factory = new Mock<IAzureClientFactory<TableServiceClient>>();
-        factory.Setup(x => x.CreateClient("test")).Returns(CommandServiceClient.Object);
-        var CommandService = new CommandService(factory.Object);
-        var op = await CommandService.UpsertAsync(
+        factory.Setup(x => x.CreateClient("test")).Returns(commandServiceClient.Object);
+        var commandService = new CommandService(factory.Object);
+        var op = await commandService.UpsertAsync(
             "test",
             "products",
             ProductDataModel.New("tech", "prod1", 100),
@@ -37,8 +37,8 @@ public static class CommandTests
 
         var failedOp = op as CommandOperation.CommandFailedOperation;
         failedOp.Should().NotBeNull();
-        failedOp!.Error.Code.Should().Be(ErrorCodes.CannotUpsert);
-        failedOp.Error.Message.Should().Be("upsert failure");
+        failedOp!.ErrorCode.Should().Be(ErrorCodes.CannotUpsert);
+        failedOp.ErrorMessage.Should().Be("upsert failure");
     }
 
     [Fact(DisplayName = "Upsert is successful")]
@@ -56,13 +56,13 @@ public static class CommandTests
             )
             .ReturnsAsync(TestResponse.Success());
 
-        var CommandServiceClient = new Mock<TableServiceClient>();
-        CommandServiceClient.Setup(x => x.GetTableClient("products")).Returns(tableClient.Object);
+        var commandServiceClient = new Mock<TableServiceClient>();
+        commandServiceClient.Setup(x => x.GetTableClient("products")).Returns(tableClient.Object);
 
         var factory = new Mock<IAzureClientFactory<TableServiceClient>>();
-        factory.Setup(x => x.CreateClient("test")).Returns(CommandServiceClient.Object);
-        var CommandService = new CommandService(factory.Object);
-        var op = await CommandService.UpsertAsync(
+        factory.Setup(x => x.CreateClient("test")).Returns(commandServiceClient.Object);
+        var commandService = new CommandService(factory.Object);
+        var op = await commandService.UpsertAsync(
             "test",
             "products",
             ProductDataModel.New("tech", "prod1", 100),
@@ -88,13 +88,13 @@ public static class CommandTests
             )
             .ReturnsAsync(TestResponse.Success());
 
-        var CommandServiceClient = new Mock<TableServiceClient>();
-        CommandServiceClient.Setup(x => x.GetTableClient("products")).Returns(tableClient.Object);
+        var commandServiceClient = new Mock<TableServiceClient>();
+        commandServiceClient.Setup(x => x.GetTableClient("products")).Returns(tableClient.Object);
 
         var factory = new Mock<IAzureClientFactory<TableServiceClient>>();
-        factory.Setup(x => x.CreateClient("test")).Returns(CommandServiceClient.Object);
-        var CommandService = new CommandService(factory.Object);
-        var op = await CommandService.UpdateAsync(
+        factory.Setup(x => x.CreateClient("test")).Returns(commandServiceClient.Object);
+        var commandService = new CommandService(factory.Object);
+        var op = await commandService.UpdateAsync(
             "test",
             "products",
             ProductDataModel.New("tech", "prod1", 100),
@@ -120,13 +120,13 @@ public static class CommandTests
             )
             .ReturnsAsync(TestResponse.Fail("entity not found"));
 
-        var CommandServiceClient = new Mock<TableServiceClient>();
-        CommandServiceClient.Setup(x => x.GetTableClient("products")).Returns(tableClient.Object);
+        var commandServiceClient = new Mock<TableServiceClient>();
+        commandServiceClient.Setup(x => x.GetTableClient("products")).Returns(tableClient.Object);
 
         var factory = new Mock<IAzureClientFactory<TableServiceClient>>();
-        factory.Setup(x => x.CreateClient("test")).Returns(CommandServiceClient.Object);
-        var CommandService = new CommandService(factory.Object);
-        var op = await CommandService.UpdateAsync(
+        factory.Setup(x => x.CreateClient("test")).Returns(commandServiceClient.Object);
+        var commandService = new CommandService(factory.Object);
+        var op = await commandService.UpdateAsync(
             "test",
             "products",
             ProductDataModel.New("tech", "prod1", 100),
@@ -135,8 +135,8 @@ public static class CommandTests
 
         var failedOp = op as CommandOperation.CommandFailedOperation;
         failedOp.Should().NotBeNull();
-        failedOp!.Error.Code.Should().Be(ErrorCodes.CannotUpdate);
-        failedOp.Error.Message.Should().Be(ErrorMessages.CannotUpdate);
+        failedOp!.ErrorCode.Should().Be(ErrorCodes.CannotUpdate);
+        failedOp.ErrorMessage.Should().Be(ErrorMessages.CannotUpdate);
     }
 
     [Theory(DisplayName = "Invalid category or table")]
@@ -146,15 +146,15 @@ public static class CommandTests
     [InlineData(null, null)]
     public static async Task InvalidCategoryAndTable(string category, string table)
     {
-        var CommandServiceClient = new Mock<TableServiceClient>();
-        CommandServiceClient
+        var commandServiceClient = new Mock<TableServiceClient>();
+        commandServiceClient
             .Setup(x => x.GetTableClient("products"))
             .Throws(new Exception("table not found"));
         var factory = new Mock<IAzureClientFactory<TableServiceClient>>();
-        factory.Setup(x => x.CreateClient("test")).Returns(CommandServiceClient.Object);
+        factory.Setup(x => x.CreateClient("test")).Returns(commandServiceClient.Object);
 
-        var CommandService = new CommandService(factory.Object);
-        var op = await CommandService.UpsertAsync(
+        var commandService = new CommandService(factory.Object);
+        var op = await commandService.UpsertAsync(
             category,
             table,
             ProductDataModel.New("tech", "prod1", 100.5d),
@@ -162,7 +162,7 @@ public static class CommandTests
         );
         var failedOp = op as CommandOperation.CommandFailedOperation;
         failedOp.Should().NotBeNull();
-        failedOp!.Error.Code.Should().Be(ErrorCodes.Invalid);
-        failedOp.Error.Message.Should().Be(ErrorMessages.EmptyOrNull);
+        failedOp!.ErrorCode.Should().Be(ErrorCodes.Invalid);
+        failedOp.ErrorMessage.Should().Be(ErrorMessages.EmptyOrNull);
     }
 }

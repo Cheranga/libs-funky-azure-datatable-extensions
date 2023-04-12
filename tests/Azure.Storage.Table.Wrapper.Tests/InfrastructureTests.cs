@@ -22,7 +22,7 @@ public static class InfrastructureTests
 
         var failedOp = op as QueryOperation.QueryFailedOperation;
         failedOp.Should().NotBeNull();
-        failedOp!.Error.Code.Should().Be(ErrorCodes.UnregisteredTableService);
+        failedOp!.ErrorCode.Should().Be(ErrorCodes.UnregisteredTableService);
     }
 
     [Fact(DisplayName = "Table does not exist")]
@@ -46,6 +46,6 @@ public static class InfrastructureTests
 
         var failedOp = op as QueryOperation.QueryFailedOperation;
         failedOp.Should().NotBeNull();
-        failedOp!.Error.Code.Should().Be(ErrorCodes.TableUnavailable);
+        failedOp!.ErrorCode.Should().Be(ErrorCodes.TableUnavailable);
     }
 }
