@@ -5,6 +5,7 @@ using LanguageExt.Common;
 using Microsoft.Extensions.Azure;
 using static Azure.Storage.Table.Wrapper.AzureTableStorageWrapper;
 using static LanguageExt.Prelude;
+using static Azure.Storage.Table.Wrapper.TableOperation;
 
 namespace Azure.Storage.Table.Wrapper;
 
@@ -22,7 +23,7 @@ internal class QueryService : IQueryService
             .ToEff()
         select unit;
 
-    public async Task<TableOperation> GetEntityAsync<T>(
+    public async Task<QueryOperation> GetEntityAsync<T>(
         string category,
         string table,
         string partitionKey,
@@ -52,12 +53,9 @@ internal class QueryService : IQueryService
                 from op in GetAsync<T>(tc, partitionKey, rowKey, token)
                 select op
             ).Run()
-        ).Match(
-            operation => operation,
-            err => TableOperation.Failure(Error.New(err.Code, err.Message, err.ToException()))
-        );
+        ).Match(operation => operation, QueryOperation.Fail);
 
-    public async Task<TableOperation> GetEntityListAsync<T>(
+    public async Task<QueryOperation> GetEntityListAsync<T>(
         string category,
         string table,
         Expression<Func<T, bool>> filter,
@@ -87,8 +85,14 @@ internal class QueryService : IQueryService
                 select records
             ).Run()
         ).Match(
-            TableOperation.GetEntities,
-            err => TableOperation.Failure(Error.New(err.Code, err.Message, err.ToException()))
+            items =>
+                items.Count == 1
+                    ? QueryOperation.Single(items.First())
+                    : QueryOperation.Collection(items),
+            err =>
+                err.Code == ErrorCodes.EntityListDoesNotExist
+                    ? QueryOperation.Empty()
+                    : QueryOperation.Fail(err)
         );
 
     private static Eff<TableClient> TableClient(

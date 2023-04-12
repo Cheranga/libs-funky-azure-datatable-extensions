@@ -1,10 +1,11 @@
 ﻿using Azure.Data.Tables;
+using static Azure.Storage.Table.Wrapper.TableOperation;
 
 namespace Azure.Storage.Table.Wrapper;
 
 public interface ICommandService
 {
-    Task<TableOperation> UpdateAsync<T>(
+    Task<CommandOperation> UpdateAsync<T>(
         string category,
         string table,
         T data,
@@ -12,7 +13,7 @@ public interface ICommandService
     )
         where T : class, ITableEntity;
 
-    Task<TableOperation> UpsertAsync<T>(
+    Task<CommandOperation> UpsertAsync<T>(
         string category,
         string table,
         T data,

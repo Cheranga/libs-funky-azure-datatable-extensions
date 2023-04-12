@@ -1,11 +1,12 @@
 ﻿using System.Linq.Expressions;
 using Azure.Data.Tables;
+using static Azure.Storage.Table.Wrapper.TableOperation;
 
 namespace Azure.Storage.Table.Wrapper;
 
 public interface IQueryService
 {
-    Task<TableOperation> GetEntityAsync<T>(
+    Task<QueryOperation> GetEntityAsync<T>(
         string category,
         string table,
         string partitionKey,
@@ -14,7 +15,7 @@ public interface IQueryService
     )
         where T : class, ITableEntity;
 
-    Task<TableOperation> GetEntityListAsync<T>(
+    Task<QueryOperation> GetEntityListAsync<T>(
         string category,
         string table,
         Expression<Func<T, bool>> filter,

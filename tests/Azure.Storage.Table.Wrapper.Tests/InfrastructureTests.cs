@@ -2,6 +2,7 @@
 using FluentAssertions;
 using Microsoft.Extensions.Azure;
 using Moq;
+using static Azure.Storage.Table.Wrapper.TableOperation;
 
 namespace Azure.Storage.Table.Wrapper.Tests;
 
@@ -20,7 +21,7 @@ public static class InfrastructureTests
             new CancellationToken()
         );
 
-        var failedOp = op as TableOperation.FailedOperation;
+        var failedOp = op as QueryOperation.QueryFailedOperation;
         failedOp.Should().NotBeNull();
         failedOp!.Error.Code.Should().Be(ErrorCodes.UnregisteredTableService);
     }
@@ -44,7 +45,7 @@ public static class InfrastructureTests
             new CancellationToken()
         );
 
-        var failedOp = op as TableOperation.FailedOperation;
+        var failedOp = op as QueryOperation.QueryFailedOperation;
         failedOp.Should().NotBeNull();
         failedOp!.Error.Code.Should().Be(ErrorCodes.TableUnavailable);
     }

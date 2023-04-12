@@ -4,6 +4,7 @@ using LanguageExt;
 using LanguageExt.Common;
 using static LanguageExt.Prelude;
 using static Azure.Storage.Table.Wrapper.AzureTableStorageWrapper;
+using static Azure.Storage.Table.Wrapper.TableOperation;
 
 namespace Azure.Storage.Table.Wrapper;
 
@@ -16,7 +17,7 @@ public class CommandService : ICommandService
         _factory = factory;
     }
 
-    public async Task<TableOperation> UpsertAsync<T>(
+    public async Task<CommandOperation> UpsertAsync<T>(
         string category,
         string table,
         T data,
@@ -43,12 +44,9 @@ public class CommandService : ICommandService
                 from _3 in guardnot(op.IsError, Error.New(ErrorCodes.CannotUpsert, op.ReasonPhrase))
                 select op
             ).Run()
-        ).Match(
-            _ => TableOperation.Success(),
-            err => TableOperation.Failure(Error.New(err.Code, err.Message, err.ToException()))
-        );
+        ).Match(_ => CommandOperation.Success(), CommandOperation.Fail);
 
-    public async Task<TableOperation> UpdateAsync<T>(
+    public async Task<CommandOperation> UpdateAsync<T>(
         string category,
         string table,
         T data,
@@ -73,10 +71,7 @@ public class CommandService : ICommandService
                 )
                 select op
             ).Run()
-        ).Match(
-            _ => TableOperation.Success(),
-            err => TableOperation.Failure(Error.New(err.Code, err.Message, err.ToException()))
-        );
+        ).Match(_ => CommandOperation.Success(), CommandOperation.Fail);
 
     private static Eff<Unit> ValidateEmptyString(string s, int errorCode, string errorMessage) =>
         from _1 in guardnot(string.IsNullOrWhiteSpace(s), Error.New(errorCode, errorMessage))

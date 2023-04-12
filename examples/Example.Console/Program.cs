@@ -3,6 +3,7 @@ using Example.Console;
 using LanguageExt;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using static Azure.Storage.Table.Wrapper.TableOperation;
 
 var host = Host.CreateDefaultBuilder()
     .ConfigureServices(services =>
@@ -43,9 +44,9 @@ async Task GetProductListAsync()
     Console.WriteLine(
         op switch
         {
-            TableOperation.QueryListOperation<ProductDataModel> products
+            QueryOperation.CollectionResult<ProductDataModel> products
                 => $"found {products.Entities.Count} items",
-            TableOperation.FailedOperation f => $"{f.Error.Code} with {f.Error.Message}",
+            QueryOperation.QueryFailedOperation f => $"{f.Error.Code} with {f.Error.Message}",
             _ => "unsupported"
         }
     );
@@ -71,9 +72,9 @@ async Task GetProductAsync()
     Console.WriteLine(
         op switch
         {
-            TableOperation.QuerySingleOperation<ProductDataModel> r
+            QueryOperation.SingleResult<ProductDataModel> r
                 => $"{r.Entity.Category}:{r.Entity.Id}:{r.Entity.Price}",
-            TableOperation.FailedOperation f
+            QueryOperation.QueryFailedOperation f
                 => $"{f.Error.Code}:{f.Error.Message}:{f.Error.ToException()}",
             _ => "unsupported"
         }
@@ -93,8 +94,8 @@ async Task AddProductAsync()
     Console.WriteLine(
         op switch
         {
-            TableOperation.CommandOperation _ => "successfully upserted",
-            TableOperation.FailedOperation f
+            CommandOperation.CommandSuccessOperation _ => "successfully upserted",
+            CommandOperation.CommandFailedOperation f
                 => $"{f.Error.Code}:{f.Error.Message}:{f.Error.ToException()}",
             _ => "unsupported"
         }

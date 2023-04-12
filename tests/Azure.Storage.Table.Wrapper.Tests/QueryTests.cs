@@ -2,6 +2,7 @@
 using FluentAssertions;
 using Microsoft.Extensions.Azure;
 using Moq;
+using static Azure.Storage.Table.Wrapper.TableOperation;
 
 namespace Azure.Storage.Table.Wrapper.Tests;
 
@@ -39,7 +40,7 @@ public static class QueryTests
             new CancellationToken()
         );
 
-        var succOp = op as TableOperation.QuerySingleOperation<ProductDataModel>;
+        var succOp = op as QueryOperation.SingleResult<ProductDataModel>;
         succOp.Should().NotBeNull();
         succOp!.Entity.Category.Should().Be("TECH");
         succOp!.Entity.Id.Should().Be("PROD1");
@@ -76,7 +77,7 @@ public static class QueryTests
             new CancellationToken()
         );
 
-        var failedOp = op as TableOperation.FailedOperation;
+        var failedOp = op as QueryOperation.QueryFailedOperation;
         failedOp!.Should().NotBeNull();
         failedOp!.Error.Code.Should().Be(ErrorCodes.EntityDoesNotExist);
     }
@@ -125,7 +126,7 @@ public static class QueryTests
             new CancellationToken()
         );
 
-        var succOp = op as TableOperation.QueryListOperation<ProductDataModel>;
+        var succOp = op as QueryOperation.CollectionResult<ProductDataModel>;
         succOp.Should().NotBeNull();
         succOp!.Entities.Count.Should().Be(2);
     }
@@ -163,9 +164,8 @@ public static class QueryTests
             new CancellationToken()
         );
 
-        var failedOp = op as TableOperation.FailedOperation;
-        failedOp.Should().NotBeNull();
-        failedOp!.Error.Code.Should().Be(ErrorCodes.EntityListDoesNotExist);
+        var emptyOp = op as QueryOperation.EmptyResult;
+        emptyOp.Should().NotBeNull();
     }
 
     [Theory(DisplayName = "Invalid category or table")]
@@ -190,7 +190,7 @@ public static class QueryTests
             "prod1",
             new CancellationToken()
         );
-        var failedOp = op as TableOperation.FailedOperation;
+        var failedOp = op as QueryOperation.QueryFailedOperation;
         failedOp.Should().NotBeNull();
         failedOp!.Error.Code.Should().Be(ErrorCodes.Invalid);
         failedOp!.Error.Message.Should().Be(ErrorMessages.EmptyOrNull);

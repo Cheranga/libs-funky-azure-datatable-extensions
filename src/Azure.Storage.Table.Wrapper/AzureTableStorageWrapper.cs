@@ -1,9 +1,11 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Net;
 using Azure.Data.Tables;
 using LanguageExt;
 using LanguageExt.Common;
 using Microsoft.Extensions.Azure;
 using static LanguageExt.Prelude;
+using static Azure.Storage.Table.Wrapper.TableOperation;
 
 namespace Azure.Storage.Table.Wrapper;
 
@@ -30,7 +32,7 @@ internal static class AzureTableStorageWrapper
             select tc
         ).MapFail(ex => Error.New(ErrorCodes.TableUnavailable, ErrorMessages.TableUnavailable, ex));
 
-    public static Aff<TableOperation> Upsert<T>(
+    public static Aff<CommandOperation> Upsert<T>(
         TableClient client,
         T data,
         CancellationToken token,
@@ -52,11 +54,11 @@ internal static class AzureTableStorageWrapper
             )
             select op
         ).Match(
-            _ => TableOperation.Success(),
-            err => TableOperation.Failure(Error.New(err.Code, err.Message, err.ToException()))
+            _ => CommandOperation.Success(),
+            err => CommandOperation.Fail(Error.New(err.Code, err.Message, err.ToException()))
         );
 
-    public static Aff<TableOperation> GetAsync<T>(
+    public static Aff<QueryOperation> GetAsync<T>(
         TableClient client,
         string partitionKey,
         string rowKey,
@@ -74,7 +76,15 @@ internal static class AzureTableStorageWrapper
             )
             select op
         ).Match(
-            response => TableOperation.GetEntity(response.Value),
-            err => TableOperation.Failure(Error.New(err.Code, err.Message, err.ToException()))
+            response => QueryOperation.Single(response.Value),
+            err =>
+                err.ToException() switch
+                {
+                    RequestFailedException rf
+                        => rf.Status == (int)(HttpStatusCode.NotFound)
+                            ? QueryOperation.Empty()
+                            : QueryOperation.Fail(err),
+                    _ => QueryOperation.Fail(err)
+                }
         );
 }
