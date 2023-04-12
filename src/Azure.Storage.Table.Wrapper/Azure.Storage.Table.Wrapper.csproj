@@ -8,7 +8,6 @@
         <PackageId>CCHAT.Azure.Storage.Table.Wrapper</PackageId>
         <Authors>Cheranga Hatangala</Authors>
         <LangVersion>10</LangVersion>
-        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <Version />
         <Title>CCHAT.Azure.Storage.Table.Wrapper</Title>
         <PackageProjectUrl>https://github.com/Cheranga/libs-azure.storage.table.wrapper</PackageProjectUrl>        
