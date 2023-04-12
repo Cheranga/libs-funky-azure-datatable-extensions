@@ -1,11 +1,12 @@
 ﻿using Azure.Data.Tables;
-using Microsoft.Extensions.Azure;
+using Azure.Storage.Table.Wrapper.Core;
 using LanguageExt;
 using LanguageExt.Common;
+using Microsoft.Extensions.Azure;
 using static LanguageExt.Prelude;
-using static Azure.Storage.Table.Wrapper.AzureTableStorageWrapper;
+using static Azure.Storage.Table.Wrapper.Core.AzureTableStorageWrapper;
 
-namespace Azure.Storage.Table.Wrapper;
+namespace Azure.Storage.Table.Wrapper.Commands;
 
 public class CommandService : ICommandService
 {

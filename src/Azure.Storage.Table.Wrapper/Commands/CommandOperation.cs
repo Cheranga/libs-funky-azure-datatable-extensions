@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using LanguageExt.Common;
 
-namespace Azure.Storage.Table.Wrapper;
+namespace Azure.Storage.Table.Wrapper.Commands;
 
 [ExcludeFromCodeCoverage]
 public abstract class CommandOperation

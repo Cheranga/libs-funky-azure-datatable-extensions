@@ -1,4 +1,6 @@
 ﻿using Azure.Data.Tables;
+using Azure.Storage.Table.Wrapper.Commands;
+using Azure.Storage.Table.Wrapper.Core;
 using FluentAssertions;
 using Microsoft.Extensions.Azure;
 using Moq;

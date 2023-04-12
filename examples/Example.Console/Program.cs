@@ -1,4 +1,7 @@
 ﻿using Azure.Storage.Table.Wrapper;
+using Azure.Storage.Table.Wrapper.Commands;
+using Azure.Storage.Table.Wrapper.Core;
+using Azure.Storage.Table.Wrapper.Queries;
 using Example.Console;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;

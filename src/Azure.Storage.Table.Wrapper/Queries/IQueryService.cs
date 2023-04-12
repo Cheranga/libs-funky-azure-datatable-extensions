@@ -1,7 +1,7 @@
 ﻿using System.Linq.Expressions;
 using Azure.Data.Tables;
 
-namespace Azure.Storage.Table.Wrapper;
+namespace Azure.Storage.Table.Wrapper.Queries;
 
 public interface IQueryService
 {

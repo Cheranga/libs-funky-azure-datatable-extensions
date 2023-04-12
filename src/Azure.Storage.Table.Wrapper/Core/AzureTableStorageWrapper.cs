@@ -1,12 +1,14 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using Azure.Data.Tables;
+using Azure.Storage.Table.Wrapper.Commands;
+using Azure.Storage.Table.Wrapper.Queries;
 using LanguageExt;
 using LanguageExt.Common;
 using Microsoft.Extensions.Azure;
 using static LanguageExt.Prelude;
 
-namespace Azure.Storage.Table.Wrapper;
+namespace Azure.Storage.Table.Wrapper.Core;
 
 [ExcludeFromCodeCoverage]
 internal static class AzureTableStorageWrapper

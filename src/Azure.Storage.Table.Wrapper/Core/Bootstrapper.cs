@@ -1,9 +1,11 @@
 using System.Diagnostics.CodeAnalysis;
 using Azure.Identity;
+using Azure.Storage.Table.Wrapper.Commands;
+using Azure.Storage.Table.Wrapper.Queries;
 using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Azure.Storage.Table.Wrapper;
+namespace Azure.Storage.Table.Wrapper.Core;
 
 [ExcludeFromCodeCoverage]
 public static class Bootstrapper

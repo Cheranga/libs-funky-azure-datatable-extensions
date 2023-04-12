@@ -1,6 +1,6 @@
 ﻿using Azure.Data.Tables;
 
-namespace Azure.Storage.Table.Wrapper;
+namespace Azure.Storage.Table.Wrapper.Commands;
 
 public interface ICommandService
 {

@@ -1,12 +1,13 @@
 ﻿using System.Linq.Expressions;
 using Azure.Data.Tables;
+using Azure.Storage.Table.Wrapper.Core;
 using LanguageExt;
 using LanguageExt.Common;
 using Microsoft.Extensions.Azure;
-using static Azure.Storage.Table.Wrapper.AzureTableStorageWrapper;
+using static Azure.Storage.Table.Wrapper.Core.AzureTableStorageWrapper;
 using static LanguageExt.Prelude;
 
-namespace Azure.Storage.Table.Wrapper;
+namespace Azure.Storage.Table.Wrapper.Queries;
 
 internal class QueryService : IQueryService
 {

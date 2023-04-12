@@ -2,7 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using Azure.Data.Tables;
 using LanguageExt.Common;
 
-namespace Azure.Storage.Table.Wrapper;
+namespace Azure.Storage.Table.Wrapper.Queries;
 
 [ExcludeFromCodeCoverage]
 public abstract class QueryOperation

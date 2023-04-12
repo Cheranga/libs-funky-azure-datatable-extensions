@@ -1,4 +1,4 @@
-namespace Azure.Storage.Table.Wrapper;
+namespace Azure.Storage.Table.Wrapper.Core;
 
 public static class ErrorCodes
 {
