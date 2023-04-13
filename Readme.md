@@ -37,8 +37,8 @@ var op = await queryService.GetEntityAsync<ProductDataModel>(
 // the operation returns the possible outputs, which you can pick and choose to operate on.
 op.Response switch
 {
-    QueryResult.SingleResult<ProductDataModel> r
-        => // do things
+    QueryResult.SingleResult<ProductDataModel> r => // do things
+    QueryResult.EmptyResult e => // do things        
     QueryResult.QueryFailedResult f => // handle things,
     _ => // handle things more
 };
@@ -59,8 +59,9 @@ var op = await queryService.GetEntityListAsync<ProductDataModel>(
 // the operation returns the possible outputs, which you can pick and choose to operate on.
 op.Response switch
 {
-    QueryResult.CollectionResult<ProductDataModel> products
-        => // do things,
+    QueryResult.CollectionResult<ProductDataModel> products => // do things,
+    QueryResult.SingleResult<ProductDataModel> s => // do things,
+    QueryResult.EmptyResult e => // do things,             
     QueryResult.QueryFailedResult f => // handle things
     _ => // handle things more
 };
