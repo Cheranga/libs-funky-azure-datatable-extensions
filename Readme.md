@@ -22,7 +22,7 @@ Wrapper functions to easily interact with Azure table storage and Cosmos
 
 ## :tada: Usage
 
-:high_brightness: Register the library with your Microsoft dependency injection
+:high_brightness: Register the library with Microsoft dependency injection framework.
 
 This will register the connectivity as a named instance. So you can register as much as named clients as you wish in your application.</br>
 In the below example `ProductsDomain` is the named client.
@@ -100,7 +100,7 @@ commandOp.Operation switch
 
 ```
 
-:high_brightness: and, that's it!
+:high_brightness: That's it!
 
 ## Attributions
 
