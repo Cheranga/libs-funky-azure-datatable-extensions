@@ -20,11 +20,100 @@ Wrapper functions to easily interact with Azure table storage and Cosmos
 
 :bulb: Support for either managed identity or connection string through dependency injection.
 
-## :tada: Usage
+## :tada: Usages
 
-:high_brightness: Register the library with Microsoft dependency injection framework.
+:high_brightness: Query with partition and row key
 
-This will register the connectivity as a named instance. So you can register as much as named clients as you wish in your application.</br>
+Use the `GetEntityAsync` method in `IQueryService` for this.
+```csharp
+var op = await queryService.GetEntityAsync<ProductDataModel>(
+    "ProductsDomain", // named service client
+    "products", // table name // table name
+    "TECH",
+    "PROD1",
+    new CancellationToken()
+    );
+
+// the operation returns the possible outputs, which you can pick and choose to operate on.
+op.Response switch
+{
+    QueryResult.SingleResult<ProductDataModel> r
+        => // do things
+    QueryResult.QueryFailedResult f => // handle things,
+    _ => // handle things more
+};
+```
+
+:high_brightness: Query with LINQ expressions
+
+Use the `GetEntityListAsync` in `IQueryService` for this.
+
+```csharp
+var op = await queryService.GetEntityListAsync<ProductDataModel>(
+    "ProductsDomain", // named service client
+    "products", // table name
+    x => x.Category == "TECH", // filter to apply as LINQ expression
+    new CancellationToken()
+);
+
+// the operation returns the possible outputs, which you can pick and choose to operate on.
+op.Response switch
+{
+    QueryResult.CollectionResult<ProductDataModel> products
+        => // do things,
+    QueryResult.QueryFailedResult f => // handle things
+    _ => // handle things more
+};
+```
+
+:high_brightness: Upsert an entity
+
+```csharp
+var productDataModel = ProductDataModel.New("TECH", "PROD1", 259.99d);
+var commandOp = await commandService.UpsertAsync(
+    "ProductsDomain", // named service client
+    "products", // table name
+    productDataModel, // table entity to upsert
+    new CancellationToken()
+);
+
+// the operation returns the possible outputs, which you can pick and choose to operate on.
+commandOp.Operation switch
+  {
+      CommandOperation.CommandSuccessOperation _ => // do things
+      CommandOperation.CommandFailedOperation f => // handle things
+      _ => // handle things more
+  }
+```
+
+:high_brightness: Update an entity
+
+Use the `UpdateAsync` method in `ICommandService` for this.
+
+```csharp
+var updateOp = await commandService.UpdateAsync(
+    category,
+    table,
+    ProductDataModel.New("TECH", "PROD1", 100.50d),
+    new CancellationToken()
+);
+
+updateOp.Operation switch
+{
+    CommandOperation.CommandSuccessOperation => // do things
+    CommandOperation.CommandFailedOperation f
+        => // handle things
+    _ => // handle things more
+};
+```
+## How to use it
+
+:high_brightness: Install package and configure
+
+Install the `CCHAT.Azure.Storage.Table.Wrapper` from nuget. </br>
+Then register it as a dependency either using `RegisterTablesWithConnectionString` or `RegisterTablesWithManagedIdentity`. </p>
+
+This will allow you to register the `TableServiceClient` as a named instance. </p>
 In the below example `ProductsDomain` is the named client.
 
 ```csharp
