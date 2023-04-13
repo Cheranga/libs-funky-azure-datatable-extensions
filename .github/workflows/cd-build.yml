@@ -1,11 +1,6 @@
 ﻿name: CD Build
 
 on:
-#  workflow_dispatch:
-#    inputs:
-#      version:
-#        description: 'Release Version'
-#        required: true
   release:
     types: [ published ]
     
@@ -37,5 +32,6 @@ jobs:
         run: dotnet nuget push **\*.nupkg --api-key ${{ secrets.NUGETPUSHKEY }} --source github --skip-duplicate        
         
       - name: Push to Nuget
+        if: ${{ github.ref == 'refs/heads/main' }}
         run: dotnet nuget push **\*.nupkg --api-key ${{ secrets.NUGETPACKAGEKEY }} --source 'https://api.nuget.org/v3/index.json' --skip-duplicate
           

@@ -1,13 +1,17 @@
-﻿using Azure.Storage.Table.Wrapper;
+﻿using Azure.Storage.Table.Wrapper.Commands;
+using Azure.Storage.Table.Wrapper.Core;
+using Azure.Storage.Table.Wrapper.Queries;
 using Example.Console;
-using LanguageExt;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+
+const string category = "ProductsCategory";
+const string table = "products";
 
 var host = Host.CreateDefaultBuilder()
     .ConfigureServices(services =>
     {
-        services.RegisterTablesWithConnectionString("ProductsDomain", "UseDevelopmentStorage=true");
+        services.RegisterTablesWithConnectionString(category, "UseDevelopmentStorage=true");
     })
     .Build();
 
@@ -17,35 +21,37 @@ var commandService = host.Services.GetRequiredService<ICommandService>();
 await AddProductAsync();
 await GetProductAsync();
 await GetProductListAsync();
+await UpdateProductAsync();
 
 async Task GetProductListAsync()
 {
-    var _ = await Enumerable
-        .Range(1, 10)
-        .ToSeq()
-        .SequenceParallel(
-            x =>
-                commandService.UpsertAsync(
-                    "ProductsDomain",
-                    "products",
-                    ProductDataModel.New("TECH", x.ToString(), x),
-                    new CancellationToken()
-                )
-        );
+    await Task.WhenAll(
+        Enumerable
+            .Range(1, 10)
+            .Select(
+                x =>
+                    commandService.UpsertAsync(
+                        category,
+                        table,
+                        ProductDataModel.New("TECH", x.ToString(), x),
+                        new CancellationToken()
+                    )
+            )
+    );
 
     var op = await queryService.GetEntityListAsync<ProductDataModel>(
-        "ProductsDomain",
-        "products",
+        category,
+        table,
         x => x.Category == "TECH",
         new CancellationToken()
     );
 
     Console.WriteLine(
-        op switch
+        op.Response switch
         {
-            TableOperation.QueryListOperation<ProductDataModel> products
+            QueryResult.CollectionResult<ProductDataModel> products
                 => $"found {products.Entities.Count} items",
-            TableOperation.FailedOperation f => $"{f.Error.Code} with {f.Error.Message}",
+            QueryResult.QueryFailedResult f => $"{f.ErrorCode} with {f.ErrorMessage}",
             _ => "unsupported"
         }
     );
@@ -55,26 +61,25 @@ async Task GetProductAsync()
 {
     var productDataModel = ProductDataModel.New("TECH", "PROD1", 259.99d);
     var _ = await commandService.UpsertAsync(
-        "ProductsDomain",
-        "products",
+        category,
+        table,
         productDataModel,
         new CancellationToken()
     );
 
     var op = await queryService.GetEntityAsync<ProductDataModel>(
-        "ProductsDomain",
-        "products",
+        category,
+        table,
         "TECH",
         "PROD1",
         new CancellationToken()
     );
     Console.WriteLine(
-        op switch
+        op.Response switch
         {
-            TableOperation.QuerySingleOperation<ProductDataModel> r
+            QueryResult.SingleResult<ProductDataModel> r
                 => $"{r.Entity.Category}:{r.Entity.Id}:{r.Entity.Price}",
-            TableOperation.FailedOperation f
-                => $"{f.Error.Code}:{f.Error.Message}:{f.Error.ToException()}",
+            QueryResult.QueryFailedResult f => $"{f.ErrorCode}:{f.ErrorMessage}:{f.Exception}",
             _ => "unsupported"
         }
     );
@@ -84,19 +89,57 @@ async Task AddProductAsync()
 {
     var productDataModel = ProductDataModel.New("TECH", "PROD1", 259.99d);
     var op = await commandService.UpsertAsync(
-        "ProductsDomain",
-        "products",
+        category,
+        table,
         productDataModel,
         new CancellationToken()
     );
 
     Console.WriteLine(
-        op switch
+        op.Operation switch
         {
-            TableOperation.CommandOperation _ => "successfully upserted",
-            TableOperation.FailedOperation f
-                => $"{f.Error.Code}:{f.Error.Message}:{f.Error.ToException()}",
+            CommandOperation.CommandSuccessOperation _ => "successfully upserted",
+            CommandOperation.CommandFailedOperation f
+                => $"{f.ErrorCode}:{f.ErrorMessage}:{f.Exception}",
             _ => "unsupported"
+        }
+    );
+}
+
+async Task UpdateProductAsync()
+{
+    var productDataModel = ProductDataModel.New("TECH", "PROD1", 259.99d);
+    var insertOp = await commandService.UpsertAsync(
+        category,
+        table,
+        productDataModel,
+        new CancellationToken()
+    );
+
+    Console.WriteLine(
+        insertOp.Operation switch
+        {
+            CommandOperation.CommandSuccessOperation _ => "successfully upserted",
+            CommandOperation.CommandFailedOperation f
+                => f.Exception is null ? throw new Exception("failed") : throw f.Exception,
+            _ => throw new Exception("unsupported")
+        }
+    );
+
+    var updateOp = await commandService.UpdateAsync(
+        category,
+        table,
+        ProductDataModel.New("TECH", "PROD1", 100.50d),
+        new CancellationToken()
+    );
+
+    Console.WriteLine(
+        updateOp.Operation switch
+        {
+            CommandOperation.CommandSuccessOperation => "successfully updated",
+            CommandOperation.CommandFailedOperation f
+                => f.Exception is null ? throw new Exception("failed") : throw f.Exception,
+            _ => throw new Exception("unsupported")
         }
     );
 }

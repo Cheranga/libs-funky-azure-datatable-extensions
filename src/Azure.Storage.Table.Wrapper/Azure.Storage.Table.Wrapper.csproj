@@ -1,25 +1,29 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net7.0</TargetFramework>
+        <TargetFramework>netstandard2.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <RepositoryUrl>https://github.com/Cheranga/libs-azure.storage.table.wrapper</RepositoryUrl>
         <PackageId>CCHAT.Azure.Storage.Table.Wrapper</PackageId>
-        <Authors>Cheranga Hatangala</Authors>        
+        <Authors>Cheranga Hatangala</Authors>
+        <LangVersion>10</LangVersion>
+        <Version />
+        <Title>CCHAT.Azure.Storage.Table.Wrapper</Title>
+        <PackageProjectUrl>https://github.com/Cheranga/libs-azure.storage.table.wrapper</PackageProjectUrl>
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Azure.Data.Tables" Version="12.8.0" />
-      <PackageReference Include="Azure.Identity" Version="1.8.2" />
-      <PackageReference Include="LanguageExt.Core" Version="4.4.2" />
-      <PackageReference Include="Microsoft.Extensions.Azure" Version="1.6.3" />
-      <PackageReference Include="System.Linq.Async" Version="6.0.1" />
+        <PackageReference Include="Azure.Data.Tables" Version="12.8.0" />
+        <PackageReference Include="Azure.Identity" Version="1.8.2" />
+        <PackageReference Include="LanguageExt.Core" Version="4.4.2" />
+        <PackageReference Include="Microsoft.Extensions.Azure" Version="1.6.3" />
+        <PackageReference Include="System.Linq.Async" Version="6.0.1" />
     </ItemGroup>
 
     <ItemGroup>
-      <Compile Remove="TableOperationError.cs" />
-      <Compile Remove="TableService.cs" />
+        <Compile Remove="TableOperationError.cs" />
+        <Compile Remove="TableService.cs" />
     </ItemGroup>
 
     <ItemGroup>

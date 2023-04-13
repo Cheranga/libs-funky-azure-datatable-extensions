@@ -5,12 +5,15 @@ namespace Azure.Storage.Table.Wrapper.Tests;
 
 public class TestResponse : Response
 {
-    private TestResponse(HttpStatusCode statusCode)
-    {
-        Status = (int)statusCode;
-    }
+    private TestResponse(HttpStatusCode statusCode) => Status = (int)statusCode;
 
     private TestResponse(string reason) => ReasonPhrase = reason;
+
+    public override int Status { get; }
+    public override string ReasonPhrase { get; } = string.Empty;
+    public override Stream? ContentStream { get; set; }
+    public override string ClientRequestId { get; set; } = string.Empty;
+    public override bool IsError => !string.IsNullOrWhiteSpace(ReasonPhrase);
 
     public override void Dispose() { }
 
@@ -30,12 +33,6 @@ public class TestResponse : Response
 
     protected override IEnumerable<HttpHeader> EnumerateHeaders() => Array.Empty<HttpHeader>();
 
-    public override int Status { get; }
-    public override string ReasonPhrase { get; } = string.Empty;
-    public override Stream? ContentStream { get; set; }
-    public override string ClientRequestId { get; set; } = string.Empty;
-    public override bool IsError => !string.IsNullOrWhiteSpace(ReasonPhrase);
-
     public static TestResponse Success() => new(HttpStatusCode.OK);
 
     public static TestResponse Fail(string reason) => new(reason);
@@ -45,10 +42,7 @@ public class TestResponse<T> : Response<T>
 {
     private readonly TestResponse _response;
 
-    private TestResponse(TestResponse response)
-    {
-        _response = response;
-    }
+    private TestResponse(TestResponse response) => _response = response;
 
     private TestResponse(TestResponse response, T data)
     {
@@ -56,9 +50,9 @@ public class TestResponse<T> : Response<T>
         Value = data;
     }
 
-    public override Response GetRawResponse() => _response;
-
     public override T Value { get; } = default!;
+
+    public override Response GetRawResponse() => _response;
 
     public static TestResponse<T> Fail(string reason) => new(TestResponse.Fail(reason));
 

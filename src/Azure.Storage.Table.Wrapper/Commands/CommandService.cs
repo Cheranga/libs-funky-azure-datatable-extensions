@@ -1,27 +1,23 @@
 ﻿using Azure.Data.Tables;
-using Microsoft.Extensions.Azure;
+using Azure.Storage.Table.Wrapper.Core;
 using LanguageExt;
 using LanguageExt.Common;
+using Microsoft.Extensions.Azure;
 using static LanguageExt.Prelude;
-using static Azure.Storage.Table.Wrapper.AzureTableStorageWrapper;
+using static Azure.Storage.Table.Wrapper.Core.AzureTableStorageWrapper;
+using static Azure.Storage.Table.Wrapper.Commands.CommandOperation;
 
-namespace Azure.Storage.Table.Wrapper;
+namespace Azure.Storage.Table.Wrapper.Commands;
 
 public class CommandService : ICommandService
 {
     private readonly IAzureClientFactory<TableServiceClient> _factory;
 
-    public CommandService(IAzureClientFactory<TableServiceClient> factory)
-    {
-        _factory = factory;
-    }
+    public CommandService(IAzureClientFactory<TableServiceClient> factory) => _factory = factory;
 
-    public async Task<TableOperation> UpsertAsync<T>(
-        string category,
-        string table,
-        T data,
-        CancellationToken token
-    )
+    public async Task<
+        CommandResponse<CommandFailedOperation, CommandSuccessOperation>
+    > UpsertAsync<T>(string category, string table, T data, CancellationToken token)
         where T : class, ITableEntity =>
         (
             await (
@@ -33,27 +29,26 @@ public class CommandService : ICommandService
                 from _2 in ValidateEmptyString(table, ErrorCodes.Invalid, ErrorMessages.EmptyOrNull)
                 from tc in TableClient(_factory, category, table)
                 from op in AffMaybe<Response>(
-                    async () =>
-                        await tc.UpsertEntityAsync(
-                            data,
-                            mode: TableUpdateMode.Replace,
-                            cancellationToken: token
-                        )
+                    async () => await tc.UpsertEntityAsync(data, TableUpdateMode.Replace, token)
                 )
                 from _3 in guardnot(op.IsError, Error.New(ErrorCodes.CannotUpsert, op.ReasonPhrase))
                 select op
             ).Run()
         ).Match(
-            _ => TableOperation.Success(),
-            err => TableOperation.Failure(Error.New(err.Code, err.Message, err.ToException()))
+            _ => Success(),
+            err =>
+                Fail(
+                    Error.New(
+                        ErrorCodes.CannotUpsert,
+                        ErrorMessages.CannotUpsert,
+                        err.ToException()
+                    )
+                )
         );
 
-    public async Task<TableOperation> UpdateAsync<T>(
-        string category,
-        string table,
-        T data,
-        CancellationToken token
-    )
+    public async Task<
+        CommandResponse<CommandFailedOperation, CommandSuccessOperation>
+    > UpdateAsync<T>(string category, string table, T data, CancellationToken token)
         where T : class, ITableEntity =>
         (
             await (
@@ -74,8 +69,15 @@ public class CommandService : ICommandService
                 select op
             ).Run()
         ).Match(
-            _ => TableOperation.Success(),
-            err => TableOperation.Failure(Error.New(err.Code, err.Message, err.ToException()))
+            _ => Success(),
+            err =>
+                Fail(
+                    Error.New(
+                        ErrorCodes.CannotUpdate,
+                        ErrorMessages.CannotUpdate,
+                        err.ToException()
+                    )
+                )
         );
 
     private static Eff<Unit> ValidateEmptyString(string s, int errorCode, string errorMessage) =>
@@ -91,4 +93,11 @@ public class CommandService : ICommandService
         from sc in GetServiceClient(factory, category)
         from tc in GetTableClient(sc, table)
         select tc;
+
+    private static CommandResponse<CommandFailedOperation, CommandSuccessOperation> Success() =>
+        CommandOperation.Success();
+
+    private static CommandResponse<CommandFailedOperation, CommandSuccessOperation> Fail(
+        Error error
+    ) => CommandOperation.Fail(error);
 }
