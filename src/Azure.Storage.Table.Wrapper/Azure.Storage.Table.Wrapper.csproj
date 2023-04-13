@@ -10,20 +10,21 @@
         <LangVersion>10</LangVersion>
         <Version />
         <Title>CCHAT.Azure.Storage.Table.Wrapper</Title>
-        <PackageProjectUrl>https://github.com/Cheranga/libs-azure.storage.table.wrapper</PackageProjectUrl>        
+        <PackageProjectUrl>https://github.com/Cheranga/libs-azure.storage.table.wrapper</PackageProjectUrl>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Azure.Data.Tables" Version="12.8.0" />
-      <PackageReference Include="Azure.Identity" Version="1.8.2" />
-      <PackageReference Include="LanguageExt.Core" Version="4.4.2" />
-      <PackageReference Include="Microsoft.Extensions.Azure" Version="1.6.3" />
-      <PackageReference Include="System.Linq.Async" Version="6.0.1" />
+        <PackageReference Include="Azure.Data.Tables" Version="12.8.0" />
+        <PackageReference Include="Azure.Identity" Version="1.8.2" />
+        <PackageReference Include="LanguageExt.Core" Version="4.4.2" />
+        <PackageReference Include="Microsoft.Extensions.Azure" Version="1.6.3" />
+        <PackageReference Include="System.Linq.Async" Version="6.0.1" />
     </ItemGroup>
 
     <ItemGroup>
-      <Compile Remove="TableOperationError.cs" />
-      <Compile Remove="TableService.cs" />
+        <Compile Remove="TableOperationError.cs" />
+        <Compile Remove="TableService.cs" />
     </ItemGroup>
 
     <ItemGroup>

@@ -13,7 +13,7 @@ public record ProductDataModel : ITableEntity
     public ETag ETag { get; set; }
 
     public static ProductDataModel New(string category, string id, double price) =>
-        new ProductDataModel
+        new()
         {
             PartitionKey = category.ToUpper(),
             RowKey = id.ToUpper(),

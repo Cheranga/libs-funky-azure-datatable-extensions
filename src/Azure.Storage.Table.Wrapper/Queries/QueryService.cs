@@ -15,18 +15,7 @@ internal class QueryService : IQueryService
 {
     private readonly IAzureClientFactory<TableServiceClient> _factory;
 
-    public QueryService(IAzureClientFactory<TableServiceClient> factory)
-    {
-        _factory = factory;
-    }
-
-    private static Eff<Unit> ValidateEmptyString(string s) =>
-        from _1 in guardnot(
-                string.IsNullOrWhiteSpace(s),
-                Error.New(ErrorCodes.Invalid, ErrorMessages.EmptyOrNull)
-            )
-            .ToEff()
-        select unit;
+    public QueryService(IAzureClientFactory<TableServiceClient> factory) => _factory = factory;
 
     public async Task<
         QueryResponse<QueryFailedResult, EmptyResult, SingleResult<T>>
@@ -54,6 +43,36 @@ internal class QueryService : IQueryService
                 .Match(GetSingle, GetError<T>)
                 .Run()
         ).Match(op => op, GetError<T>);
+
+    public async Task<
+        QueryResponse<QueryFailedResult, EmptyResult, SingleResult<T>, CollectionResult<T>>
+    > GetEntityListAsync<T>(
+        string category,
+        string table,
+        Expression<Func<T, bool>> filter,
+        CancellationToken token
+    )
+        where T : class, ITableEntity =>
+        (
+            await (
+                from _1 in ValidateEmptyString(category)
+                from _2 in ValidateEmptyString(table)
+                from tc in TableClient(_factory, category, table)
+                from records in Aff(
+                    async () =>
+                        await tc.QueryAsync<T>(filter, cancellationToken: token).ToListAsync(token)
+                )
+                select records?.ToList() ?? new List<T>()
+            ).Run()
+        ).Match(GetCollection, GetCollectionError<T>);
+
+    private static Eff<Unit> ValidateEmptyString(string s) =>
+        from _1 in guardnot(
+                string.IsNullOrWhiteSpace(s),
+                Error.New(ErrorCodes.Invalid, ErrorMessages.EmptyOrNull)
+            )
+            .ToEff()
+        select unit;
 
     private static QueryResponse<QueryFailedResult, EmptyResult, SingleResult<T>> GetSingle<T>(
         Response<T> data
@@ -94,28 +113,6 @@ internal class QueryService : IQueryService
             )
         );
 
-    public async Task<
-        QueryResponse<QueryFailedResult, EmptyResult, SingleResult<T>, CollectionResult<T>>
-    > GetEntityListAsync<T>(
-        string category,
-        string table,
-        Expression<Func<T, bool>> filter,
-        CancellationToken token
-    )
-        where T : class, ITableEntity =>
-        (
-            await (
-                from _1 in ValidateEmptyString(category)
-                from _2 in ValidateEmptyString(table)
-                from tc in TableClient(_factory, category, table)
-                from records in Aff(
-                    async () =>
-                        await tc.QueryAsync<T>(filter, cancellationToken: token).ToListAsync(token)
-                )
-                select records?.ToList() ?? new List<T>()
-            ).Run()
-        ).Match(GetCollection, GetCollectionError<T>);
-
     private static QueryResponse<
         QueryFailedResult,
         EmptyResult,
@@ -126,7 +123,7 @@ internal class QueryService : IQueryService
         items.Count switch
         {
             0 => Empty(),
-            1 => QueryResult.Single(items.First()),
+            1 => Single(items.First()),
             _ => Collection(items)
         };
 

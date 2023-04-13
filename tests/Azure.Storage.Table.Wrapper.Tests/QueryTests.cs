@@ -274,13 +274,11 @@ public static class QueryTests
             new CancellationToken()
         );
 
-        var response = (
-            op.Response switch
-            {
-                QueryResult.QueryFailedResult qf => new { qf.ErrorCode, qf.ErrorMessage },
-                _ => new { ErrorCode = -1, ErrorMessage = string.Empty }
-            }
-        );
+        var response = op.Response switch
+        {
+            QueryResult.QueryFailedResult qf => new { qf.ErrorCode, qf.ErrorMessage },
+            _ => new { ErrorCode = -1, ErrorMessage = string.Empty }
+        };
         response.ErrorCode.Should().Be(ErrorCodes.CannotGetDataFromTable);
         response.ErrorMessage.Should().Be(ErrorMessages.CannotGetDataFromTable);
     }
@@ -349,13 +347,11 @@ public static class QueryTests
             "prod1",
             new CancellationToken()
         );
-        var response = (
-            op.Response switch
-            {
-                QueryResult.QueryFailedResult qf => new { qf.ErrorCode, qf.ErrorMessage },
-                _ => new { ErrorCode = -1, ErrorMessage = string.Empty }
-            }
-        );
+        var response = op.Response switch
+        {
+            QueryResult.QueryFailedResult qf => new { qf.ErrorCode, qf.ErrorMessage },
+            _ => new { ErrorCode = -1, ErrorMessage = string.Empty }
+        };
         response.ErrorCode.Should().Be(ErrorCodes.Invalid);
         response.ErrorMessage.Should().Be(ErrorMessages.EmptyOrNull);
     }

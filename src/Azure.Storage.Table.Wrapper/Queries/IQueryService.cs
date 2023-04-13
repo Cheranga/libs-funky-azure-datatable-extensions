@@ -1,6 +1,5 @@
 ﻿using System.Linq.Expressions;
 using Azure.Data.Tables;
-using Azure.Storage.Table.Wrapper.Core;
 using static Azure.Storage.Table.Wrapper.Queries.QueryResult;
 
 namespace Azure.Storage.Table.Wrapper.Queries;

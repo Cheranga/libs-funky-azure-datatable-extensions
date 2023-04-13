@@ -1,10 +1,11 @@
 ﻿using Azure.Data.Tables;
+using static Azure.Storage.Table.Wrapper.Commands.CommandOperation;
 
 namespace Azure.Storage.Table.Wrapper.Commands;
 
 public interface ICommandService
 {
-    Task<CommandOperation> UpdateAsync<T>(
+    Task<CommandResponse<CommandFailedOperation, CommandSuccessOperation>> UpdateAsync<T>(
         string category,
         string table,
         T data,
@@ -12,7 +13,7 @@ public interface ICommandService
     )
         where T : class, ITableEntity;
 
-    Task<CommandOperation> UpsertAsync<T>(
+    Task<CommandResponse<CommandFailedOperation, CommandSuccessOperation>> UpsertAsync<T>(
         string category,
         string table,
         T data,

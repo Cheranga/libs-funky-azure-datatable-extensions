@@ -8,23 +8,19 @@ public abstract class CommandOperation
 {
     private CommandOperation() { }
 
-    internal static CommandOperation Success() => CommandSuccessOperation.New();
+    internal static CommandSuccessOperation Success() => CommandSuccessOperation.New();
 
-    internal static CommandOperation Fail(Error error) => CommandFailedOperation.New(error);
+    internal static CommandFailedOperation Fail(Error error) => CommandFailedOperation.New(error);
 
     public sealed class CommandSuccessOperation : CommandOperation
     {
         private CommandSuccessOperation() { }
 
-        internal static CommandOperation New() => new CommandSuccessOperation();
+        internal static CommandSuccessOperation New() => new();
     }
 
     public sealed class CommandFailedOperation : CommandOperation
     {
-        public int ErrorCode { get; }
-        public string ErrorMessage { get; }
-        public Exception? Exception { get; }
-
         private CommandFailedOperation(Error error)
         {
             ErrorCode = error.Code;
@@ -32,6 +28,10 @@ public abstract class CommandOperation
             Exception = error.ToException();
         }
 
-        internal static CommandOperation New(Error error) => new CommandFailedOperation(error);
+        public int ErrorCode { get; }
+        public string ErrorMessage { get; }
+        public Exception? Exception { get; }
+
+        internal static CommandFailedOperation New(Error error) => new(error);
     }
 }

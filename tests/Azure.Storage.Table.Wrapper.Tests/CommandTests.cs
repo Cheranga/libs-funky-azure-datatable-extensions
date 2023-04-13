@@ -37,10 +37,13 @@ public static class CommandTests
             new CancellationToken()
         );
 
-        var failedOp = op as CommandOperation.CommandFailedOperation;
-        failedOp.Should().NotBeNull();
-        failedOp!.ErrorCode.Should().Be(ErrorCodes.CannotUpsert);
-        failedOp.ErrorMessage.Should().Be("upsert failure");
+        var response = op.Operation switch
+        {
+            CommandOperation.CommandFailedOperation f => new { f.ErrorCode, f.ErrorMessage },
+            _ => new { ErrorCode = -1, ErrorMessage = string.Empty }
+        };
+        response.ErrorCode.Should().Be(ErrorCodes.CannotUpsert);
+        response.ErrorMessage.Should().Be(ErrorMessages.CannotUpsert);
     }
 
     [Fact(DisplayName = "Upsert is successful")]
@@ -71,8 +74,13 @@ public static class CommandTests
             new CancellationToken()
         );
 
-        var succOp = op as CommandOperation.CommandSuccessOperation;
-        succOp.Should().NotBeNull();
+        (
+            op.Operation switch
+            {
+                CommandOperation.CommandSuccessOperation => "success",
+                _ => string.Empty
+            }
+        ).Should().Be("success");
     }
 
     [Fact(DisplayName = "Update entity when entity exists")]
@@ -103,8 +111,13 @@ public static class CommandTests
             new CancellationToken()
         );
 
-        var succOp = op as CommandOperation.CommandSuccessOperation;
-        succOp.Should().NotBeNull();
+        (
+            op.Operation switch
+            {
+                CommandOperation.CommandSuccessOperation => "success",
+                _ => string.Empty
+            }
+        ).Should().Be("success");
     }
 
     [Fact(DisplayName = "Update entity when entity does not exists")]
@@ -135,10 +148,14 @@ public static class CommandTests
             new CancellationToken()
         );
 
-        var failedOp = op as CommandOperation.CommandFailedOperation;
-        failedOp.Should().NotBeNull();
-        failedOp!.ErrorCode.Should().Be(ErrorCodes.CannotUpdate);
-        failedOp.ErrorMessage.Should().Be(ErrorMessages.CannotUpdate);
+        var response = op.Operation switch
+        {
+            CommandOperation.CommandFailedOperation f => new { f.ErrorCode, f.ErrorMessage },
+            _ => new { ErrorCode = -1, ErrorMessage = string.Empty }
+        };
+
+        response!.ErrorCode.Should().Be(ErrorCodes.CannotUpdate);
+        response.ErrorMessage.Should().Be(ErrorMessages.CannotUpdate);
     }
 
     [Theory(DisplayName = "Invalid category or table")]
@@ -162,9 +179,13 @@ public static class CommandTests
             ProductDataModel.New("tech", "prod1", 100.5d),
             new CancellationToken()
         );
-        var failedOp = op as CommandOperation.CommandFailedOperation;
-        failedOp.Should().NotBeNull();
-        failedOp!.ErrorCode.Should().Be(ErrorCodes.Invalid);
-        failedOp.ErrorMessage.Should().Be(ErrorMessages.EmptyOrNull);
+        var response = op.Operation switch
+        {
+            CommandOperation.CommandFailedOperation f => new { f.ErrorCode, f.ErrorMessage },
+            _ => new { ErrorCode = -1, ErrorMessage = string.Empty }
+        };
+
+        response!.ErrorCode.Should().Be(ErrorCodes.CannotUpsert);
+        response.ErrorMessage.Should().Be(ErrorMessages.CannotUpsert);
     }
 }

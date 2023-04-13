@@ -17,6 +17,7 @@ public static class ErrorMessages
 {
     public const string UnregisteredTableService =
         "table service is unregistered for the storage account";
+
     public const string TableUnavailable = "table is unavailable";
     public const string CannotUpsert = "data cannot be upserted into the storage table";
     public const string EntityDoesNotExist = "entity does not exist";

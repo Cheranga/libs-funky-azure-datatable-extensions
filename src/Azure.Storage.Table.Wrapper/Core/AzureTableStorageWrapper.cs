@@ -1,7 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
-using System.Net;
 using Azure.Data.Tables;
-using Azure.Storage.Table.Wrapper.Queries;
 using LanguageExt;
 using LanguageExt.Common;
 using Microsoft.Extensions.Azure;
