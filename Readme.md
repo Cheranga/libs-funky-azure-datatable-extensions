@@ -37,10 +37,10 @@ var op = await queryService.GetEntityAsync<ProductDataModel>(
 // the operation returns the possible outputs, which you can pick and choose to operate on.
 op.Response switch
 {
-    QueryResult.SingleResult<ProductDataModel> r => // do things
-    QueryResult.EmptyResult e => // do things        
-    QueryResult.QueryFailedResult f => // handle things,
-    _ => // handle things more
+    QueryResult.SingleResult<ProductDataModel> r => ,// do things
+    QueryResult.EmptyResult e => ,// do things        
+    QueryResult.QueryFailedResult f => ,// handle things,
+    _ => ,// handle things more
 };
 ```
 
@@ -59,10 +59,10 @@ var op = await queryService.GetEntityListAsync<ProductDataModel>(
 // the operation returns the possible outputs, which you can pick and choose to operate on.
 op.Response switch
 {
-    QueryResult.CollectionResult<ProductDataModel> products => // do things,
-    QueryResult.SingleResult<ProductDataModel> s => // do things,
-    QueryResult.EmptyResult e => // do things,             
-    QueryResult.QueryFailedResult f => // handle things
+    QueryResult.CollectionResult<ProductDataModel> products => ,// do things,
+    QueryResult.SingleResult<ProductDataModel> s => ,// do things,
+    QueryResult.EmptyResult e => ,// do things,             
+    QueryResult.QueryFailedResult f => ,// handle things
     _ => // handle things more
 };
 ```
@@ -81,8 +81,8 @@ var commandOp = await commandService.UpsertAsync(
 // the operation returns the possible outputs, which you can pick and choose to operate on.
 commandOp.Operation switch
   {
-      CommandOperation.CommandSuccessOperation _ => // do things
-      CommandOperation.CommandFailedOperation f => // handle things
+      CommandOperation.CommandSuccessOperation _ => ,// do things
+      CommandOperation.CommandFailedOperation f => ,// handle things
       _ => // handle things more
   }
 ```
@@ -101,9 +101,8 @@ var updateOp = await commandService.UpdateAsync(
 
 updateOp.Operation switch
 {
-    CommandOperation.CommandSuccessOperation => // do things
-    CommandOperation.CommandFailedOperation f
-        => // handle things
+    CommandOperation.CommandSuccessOperation => ,// do things
+    CommandOperation.CommandFailedOperation f => , // handle things
     _ => // handle things more
 };
 ```
@@ -158,8 +157,7 @@ var readOp = await queryService.GetEntityAsync<ProductDataModel>(
 // depending on the response, you can decide what to do next
 readOp.Response switch
       {
-          QueryResult.SingleResult<ProductDataModel> r
-              => GetSuccessResponse(r),
+          QueryResult.SingleResult<ProductDataModel> r => GetSuccessResponse(r),
           QueryResult.QueryFailedResult f => GetFailedResponse(f),
           _ => GetServerErrorResponse()
       }
@@ -183,8 +181,7 @@ var commandOp = await commandService.UpsertAsync(
 commandOp.Operation switch
   {
       CommandOperation.CommandSuccessOperation _ => // do stuff,
-      CommandOperation.CommandFailedOperation f
-          => // do error stuff,
+      CommandOperation.CommandFailedOperation f => // do error stuff,
       _ => throw new NotSupportedException()
   }
 
