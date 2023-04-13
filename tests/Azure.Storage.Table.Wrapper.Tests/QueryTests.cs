@@ -1,4 +1,5 @@
-﻿using Azure.Data.Tables;
+﻿using System.Net;
+using Azure.Data.Tables;
 using Azure.Storage.Table.Wrapper.Core;
 using Azure.Storage.Table.Wrapper.Queries;
 using FluentAssertions;
@@ -41,11 +42,15 @@ public static class QueryTests
             new CancellationToken()
         );
 
-        var succOp = op as QueryOperation.SingleResult<ProductDataModel>;
-        succOp.Should().NotBeNull();
-        succOp!.Entity.Category.Should().Be("TECH");
-        succOp!.Entity.Id.Should().Be("PROD1");
-        succOp!.Entity.Price.Should().Be(100);
+        var response = op.Response switch
+        {
+            QueryResult.SingleResult<ProductDataModel> qf => qf.Entity,
+            _ => null
+        };
+        response.Should().NotBeNull();
+        response!.Category.Should().Be("TECH");
+        response.Id.Should().Be("PROD1");
+        response.Price.Should().Be(100);
     }
 
     [Fact(DisplayName = "Entity does not exist")]
@@ -62,7 +67,7 @@ public static class QueryTests
                         It.IsAny<CancellationToken>()
                     )
             )
-            .ReturnsAsync(TestResponse<ProductDataModel>.Fail("entity not found"));
+            .Throws(new RequestFailedException((int)HttpStatusCode.NotFound, "entity not found"));
 
         var tableServiceClient = new Mock<TableServiceClient>();
         tableServiceClient.Setup(x => x.GetTableClient("products")).Returns(tableClient.Object);
@@ -78,9 +83,13 @@ public static class QueryTests
             new CancellationToken()
         );
 
-        var failedOp = op as QueryOperation.QueryFailedOperation;
-        failedOp!.Should().NotBeNull();
-        failedOp!.ErrorCode.Should().Be(ErrorCodes.EntityDoesNotExist);
+        (
+            op.Response switch
+            {
+                QueryResult.EmptyResult => "empty",
+                _ => string.Empty
+            }
+        ).Should().Be("empty");
     }
 
     [Fact(DisplayName = "Filter returns a collection of entities")]
@@ -127,9 +136,13 @@ public static class QueryTests
             new CancellationToken()
         );
 
-        var succOp = op as QueryOperation.CollectionResult<ProductDataModel>;
-        succOp.Should().NotBeNull();
-        succOp!.Entities.Count.Should().Be(2);
+        (
+            op.Response switch
+            {
+                QueryResult.CollectionResult<ProductDataModel> qf => qf.Entities,
+                _ => new List<ProductDataModel>()
+            }
+        ).Count.Should().Be(2);
     }
 
     [Fact(DisplayName = "Filter returns a single entity")]
@@ -172,11 +185,15 @@ public static class QueryTests
             new CancellationToken()
         );
 
-        var succOp = op as QueryOperation.SingleResult<ProductDataModel>;
-        succOp.Should().NotBeNull();
-        succOp!.Entity.Category.Should().Be("TECH");
-        succOp.Entity.Id.Should().Be("PROD1");
-        succOp.Entity.Price.Should().Be(100);
+        var response = op.Response switch
+        {
+            QueryResult.SingleResult<ProductDataModel> qf => qf.Entity,
+            _ => null
+        };
+        response.Should().NotBeNull();
+        response!.Category.Should().Be("TECH");
+        response.Id.Should().Be("PROD1");
+        response.Price.Should().Be(100);
     }
 
     [Fact(DisplayName = "Filter returns empty")]
@@ -219,8 +236,13 @@ public static class QueryTests
             new CancellationToken()
         );
 
-        var succOp = op as QueryOperation.EmptyResult;
-        succOp.Should().NotBeNull();
+        (
+            op.Response switch
+            {
+                QueryResult.EmptyResult qf => "empty",
+                _ => string.Empty
+            }
+        ).Should().Be("empty");
     }
 
     [Fact(DisplayName = "Filter throws error")]
@@ -252,10 +274,15 @@ public static class QueryTests
             new CancellationToken()
         );
 
-        var failedOp = op as QueryOperation.QueryFailedOperation;
-        failedOp.Should().NotBeNull();
-        failedOp!.ErrorCode.Should().Be(ErrorCodes.CannotGetDataFromTable);
-        failedOp.ErrorMessage.Should().Be(ErrorMessages.CannotGetDataFromTable);
+        var response = (
+            op.Response switch
+            {
+                QueryResult.QueryFailedResult qf => new { qf.ErrorCode, qf.ErrorMessage },
+                _ => new { ErrorCode = -1, ErrorMessage = string.Empty }
+            }
+        );
+        response.ErrorCode.Should().Be(ErrorCodes.CannotGetDataFromTable);
+        response.ErrorMessage.Should().Be(ErrorMessages.CannotGetDataFromTable);
     }
 
     [Fact(DisplayName = "Filter does not return entities")]
@@ -291,8 +318,13 @@ public static class QueryTests
             new CancellationToken()
         );
 
-        var emptyOp = op as QueryOperation.EmptyResult;
-        emptyOp.Should().NotBeNull();
+        (
+            op.Response switch
+            {
+                QueryResult.EmptyResult => "empty",
+                _ => string.Empty
+            }
+        ).Should().Be("empty");
     }
 
     [Theory(DisplayName = "Invalid category or table")]
@@ -317,9 +349,14 @@ public static class QueryTests
             "prod1",
             new CancellationToken()
         );
-        var failedOp = op as QueryOperation.QueryFailedOperation;
-        failedOp.Should().NotBeNull();
-        failedOp!.ErrorCode.Should().Be(ErrorCodes.Invalid);
-        failedOp!.ErrorMessage.Should().Be(ErrorMessages.EmptyOrNull);
+        var response = (
+            op.Response switch
+            {
+                QueryResult.QueryFailedResult qf => new { qf.ErrorCode, qf.ErrorMessage },
+                _ => new { ErrorCode = -1, ErrorMessage = string.Empty }
+            }
+        );
+        response.ErrorCode.Should().Be(ErrorCodes.Invalid);
+        response.ErrorMessage.Should().Be(ErrorMessages.EmptyOrNull);
     }
 }

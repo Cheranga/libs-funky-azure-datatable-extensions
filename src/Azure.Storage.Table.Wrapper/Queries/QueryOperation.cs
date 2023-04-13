@@ -5,26 +5,26 @@ using LanguageExt.Common;
 namespace Azure.Storage.Table.Wrapper.Queries;
 
 [ExcludeFromCodeCoverage]
-public abstract class QueryOperation
+public abstract record QueryResult
 {
-    internal static QueryOperation Fail(Error error) => QueryFailedOperation.New(error);
+    internal static QueryFailedResult Fail(Error error) => QueryFailedResult.New(error);
 
-    internal static QueryOperation Empty() => EmptyResult.New();
+    internal static EmptyResult Empty() => EmptyResult.New();
 
-    internal static QueryOperation Single<T>(T data)
+    internal static SingleResult<T> Single<T>(T data)
         where T : class, ITableEntity => SingleResult<T>.New(data);
 
-    internal static QueryOperation Collection<T>(IEnumerable<T> data)
+    internal static CollectionResult<T> Collection<T>(IEnumerable<T> data)
         where T : class, ITableEntity => CollectionResult<T>.New(data);
 
-    public sealed class EmptyResult : QueryOperation
+    public sealed record EmptyResult : QueryResult
     {
         private EmptyResult() { }
 
         internal static EmptyResult New() => new();
     }
 
-    public sealed class SingleResult<T> : QueryOperation
+    public sealed record SingleResult<T> : QueryResult
         where T : class, ITableEntity
     {
         private SingleResult(T entity) => Entity = entity;
@@ -34,7 +34,7 @@ public abstract class QueryOperation
         internal static SingleResult<T> New(T data) => new(data);
     }
 
-    public sealed class CollectionResult<T> : QueryOperation
+    public sealed record CollectionResult<T> : QueryResult
         where T : class, ITableEntity
     {
         private CollectionResult(IEnumerable<T> entities) =>
@@ -45,19 +45,19 @@ public abstract class QueryOperation
         internal static CollectionResult<T> New(IEnumerable<T> data) => new(data);
     }
 
-    public sealed class QueryFailedOperation : QueryOperation
+    public sealed record QueryFailedResult : QueryResult
     {
         public int ErrorCode { get; }
         public string ErrorMessage { get; }
         public Exception? Exception { get; }
 
-        private QueryFailedOperation(Error error)
+        private QueryFailedResult(Error error)
         {
             ErrorCode = error.Code;
             ErrorMessage = error.Message;
             Exception = error.ToException();
         }
 
-        internal static QueryOperation New(Error error) => new QueryFailedOperation(error);
+        internal static QueryFailedResult New(Error error) => new(error);
     }
 }
