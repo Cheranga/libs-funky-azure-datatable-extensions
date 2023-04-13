@@ -43,11 +43,11 @@ async Task GetProductListAsync()
     );
 
     Console.WriteLine(
-        op switch
+        op.Response switch
         {
-            QueryOperation.CollectionResult<ProductDataModel> products
+            QueryResult.CollectionResult<ProductDataModel> products
                 => $"found {products.Entities.Count} items",
-            QueryOperation.QueryFailedOperation f => $"{f.ErrorCode} with {f.ErrorMessage}",
+            QueryResult.QueryFailedResult f => $"{f.ErrorCode} with {f.ErrorMessage}",
             _ => "unsupported"
         }
     );
@@ -71,12 +71,11 @@ async Task GetProductAsync()
         new CancellationToken()
     );
     Console.WriteLine(
-        op switch
+        op.Response switch
         {
-            QueryOperation.SingleResult<ProductDataModel> r
+            QueryResult.SingleResult<ProductDataModel> r
                 => $"{r.Entity.Category}:{r.Entity.Id}:{r.Entity.Price}",
-            QueryOperation.QueryFailedOperation f
-                => $"{f.ErrorCode}:{f.ErrorMessage}:{f.Exception}",
+            QueryResult.QueryFailedResult f => $"{f.ErrorCode}:{f.ErrorMessage}:{f.Exception}",
             _ => "unsupported"
         }
     );

@@ -1,4 +1,5 @@
 ﻿using System.Linq.Expressions;
+using System.Net;
 using Azure.Data.Tables;
 using Azure.Storage.Table.Wrapper.Core;
 using LanguageExt;
@@ -6,6 +7,7 @@ using LanguageExt.Common;
 using Microsoft.Extensions.Azure;
 using static Azure.Storage.Table.Wrapper.Core.AzureTableStorageWrapper;
 using static LanguageExt.Prelude;
+using static Azure.Storage.Table.Wrapper.Queries.QueryResult;
 
 namespace Azure.Storage.Table.Wrapper.Queries;
 
@@ -18,12 +20,17 @@ internal class QueryService : IQueryService
         _factory = factory;
     }
 
-    private static Eff<Unit> ValidateEmptyString(string s, int errorCode, string errorMessage) =>
-        from _1 in guardnot(string.IsNullOrWhiteSpace(s), Error.New(errorCode, errorMessage))
+    private static Eff<Unit> ValidateEmptyString(string s) =>
+        from _1 in guardnot(
+                string.IsNullOrWhiteSpace(s),
+                Error.New(ErrorCodes.Invalid, ErrorMessages.EmptyOrNull)
+            )
             .ToEff()
         select unit;
 
-    public async Task<QueryOperation> GetEntityAsync<T>(
+    public async Task<
+        QueryResponse<QueryFailedResult, EmptyResult, SingleResult<T>>
+    > GetEntityAsync<T>(
         string category,
         string table,
         string partitionKey,
@@ -33,29 +40,63 @@ internal class QueryService : IQueryService
         where T : class, ITableEntity =>
         (
             await (
-                from _1 in ValidateEmptyString(
-                    category,
-                    ErrorCodes.Invalid,
-                    ErrorMessages.EmptyOrNull
-                )
-                from _2 in ValidateEmptyString(table, ErrorCodes.Invalid, ErrorMessages.EmptyOrNull)
-                from _3 in ValidateEmptyString(
-                    partitionKey,
-                    ErrorCodes.Invalid,
-                    ErrorMessages.EmptyOrNull
-                )
-                from _4 in ValidateEmptyString(
-                    rowKey,
-                    ErrorCodes.Invalid,
-                    ErrorMessages.EmptyOrNull
-                )
+                from _1 in ValidateEmptyString(category)
+                from _2 in ValidateEmptyString(table)
+                from _3 in ValidateEmptyString(partitionKey)
+                from _4 in ValidateEmptyString(rowKey)
                 from tc in TableClient(_factory, category, table)
-                from op in GetAsync<T>(tc, partitionKey, rowKey, token)
+                from op in AffMaybe<Response<T>>(
+                    async () =>
+                        await tc.GetEntityAsync<T>(partitionKey, rowKey, cancellationToken: token)
+                )
                 select op
-            ).Run()
-        ).Match(operation => operation, QueryOperation.Fail);
+            )
+                .Match(GetSingle, GetError<T>)
+                .Run()
+        ).Match(op => op, GetError<T>);
 
-    public async Task<QueryOperation> GetEntityListAsync<T>(
+    private static QueryResponse<QueryFailedResult, EmptyResult, SingleResult<T>> GetSingle<T>(
+        Response<T> data
+    )
+        where T : class, ITableEntity => Single(data.Value);
+
+    private static QueryResponse<QueryFailedResult, EmptyResult, SingleResult<T>> GetError<T>(
+        Error error
+    )
+        where T : class, ITableEntity =>
+        error.ToException() switch
+        {
+            RequestFailedException rf
+                => rf.Status == (int)HttpStatusCode.NotFound
+                    ? Empty()
+                    : Fail(
+                        Error.New(
+                            ErrorCodes.CannotGetDataFromTable,
+                            error.Message,
+                            error.ToException()
+                        )
+                    ),
+            _ => Fail(error)
+        };
+
+    private static QueryResponse<
+        QueryFailedResult,
+        EmptyResult,
+        SingleResult<T>,
+        CollectionResult<T>
+    > GetCollectionError<T>(Error error)
+        where T : class, ITableEntity =>
+        Fail(
+            Error.New(
+                ErrorCodes.CannotGetDataFromTable,
+                ErrorMessages.CannotGetDataFromTable,
+                error.ToException()
+            )
+        );
+
+    public async Task<
+        QueryResponse<QueryFailedResult, EmptyResult, SingleResult<T>, CollectionResult<T>>
+    > GetEntityListAsync<T>(
         string category,
         string table,
         Expression<Func<T, bool>> filter,
@@ -64,12 +105,8 @@ internal class QueryService : IQueryService
         where T : class, ITableEntity =>
         (
             await (
-                from _1 in ValidateEmptyString(
-                    category,
-                    ErrorCodes.Invalid,
-                    ErrorMessages.EmptyOrNull
-                )
-                from _2 in ValidateEmptyString(table, ErrorCodes.Invalid, ErrorMessages.EmptyOrNull)
+                from _1 in ValidateEmptyString(category)
+                from _2 in ValidateEmptyString(table)
                 from tc in TableClient(_factory, category, table)
                 from records in Aff(
                     async () =>
@@ -77,23 +114,21 @@ internal class QueryService : IQueryService
                 )
                 select records?.ToList() ?? new List<T>()
             ).Run()
-        ).Match(
-            items =>
-                items.Count switch
-                {
-                    0 => QueryOperation.Empty(),
-                    1 => QueryOperation.Single(items.First()),
-                    _ => QueryOperation.Collection(items)
-                },
-            err =>
-                QueryOperation.Fail(
-                    Error.New(
-                        ErrorCodes.CannotGetDataFromTable,
-                        ErrorMessages.CannotGetDataFromTable,
-                        err.ToException()
-                    )
-                )
-        );
+        ).Match(GetCollection, GetCollectionError<T>);
+
+    private static QueryResponse<
+        QueryFailedResult,
+        EmptyResult,
+        SingleResult<T>,
+        CollectionResult<T>
+    > GetCollection<T>(List<T> items)
+        where T : class, ITableEntity =>
+        items.Count switch
+        {
+            0 => Empty(),
+            1 => QueryResult.Single(items.First()),
+            _ => Collection(items)
+        };
 
     private static Eff<TableClient> TableClient(
         IAzureClientFactory<TableServiceClient> factory,

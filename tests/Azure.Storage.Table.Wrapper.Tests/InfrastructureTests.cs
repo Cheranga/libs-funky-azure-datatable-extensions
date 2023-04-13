@@ -3,6 +3,7 @@ using Azure.Storage.Table.Wrapper.Core;
 using Azure.Storage.Table.Wrapper.Queries;
 using FluentAssertions;
 using Microsoft.Extensions.Azure;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Moq;
 
 namespace Azure.Storage.Table.Wrapper.Tests;
@@ -22,9 +23,15 @@ public static class InfrastructureTests
             new CancellationToken()
         );
 
-        var failedOp = op as QueryOperation.QueryFailedOperation;
-        failedOp.Should().NotBeNull();
-        failedOp!.ErrorCode.Should().Be(ErrorCodes.UnregisteredTableService);
+        var response = (
+            op.Response switch
+            {
+                QueryResult.QueryFailedResult qf => new { qf.ErrorCode, qf.ErrorMessage },
+                _ => new { ErrorCode = -1, ErrorMessage = string.Empty }
+            }
+        );
+        response.ErrorCode.Should().Be(ErrorCodes.UnregisteredTableService);
+        response.ErrorMessage.Should().Be(ErrorMessages.UnregisteredTableService);
     }
 
     [Fact(DisplayName = "Table does not exist")]
@@ -46,8 +53,14 @@ public static class InfrastructureTests
             new CancellationToken()
         );
 
-        var failedOp = op as QueryOperation.QueryFailedOperation;
-        failedOp.Should().NotBeNull();
-        failedOp!.ErrorCode.Should().Be(ErrorCodes.TableUnavailable);
+        var response = (
+            op.Response switch
+            {
+                QueryResult.QueryFailedResult qf => new { qf.ErrorCode, qf.ErrorMessage },
+                _ => new { ErrorCode = -1, ErrorMessage = string.Empty }
+            }
+        );
+        response.ErrorCode.Should().Be(ErrorCodes.TableUnavailable);
+        response.ErrorMessage.Should().Be(ErrorMessages.TableUnavailable);
     }
 }
