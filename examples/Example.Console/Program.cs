@@ -15,7 +15,6 @@ var host = Host.CreateDefaultBuilder()
     })
     .Build();
 
-
 var queryService = host.Services.GetRequiredService<IQueryService>();
 var commandService = host.Services.GetRequiredService<ICommandService>();
 
