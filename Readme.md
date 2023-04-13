@@ -9,14 +9,14 @@ Wrapper functions to easily interact with Azure table storage and Cosmos
 
 </div>
 
-> The library uses Microsoft's `Azure.Data.Tables` package to perform data operations. 
+> The library uses Microsoft's `Azure.Data.Tables` package to perform data operations.</p>
 > The library separates commands and queries, and provides separate methods to be used easily on your data tables.
 
 ## :tada: Features
 
 :bulb: Separation of command and query operations.
 
-:bulb: Query responses are strongly typed with clear intentions of what will be returned.
+:bulb: Query and command responses are strongly typed with clear intentions of what will be returned.
 
 :bulb: Support for either managed identity or connection string through dependency injection.
 
@@ -24,7 +24,8 @@ Wrapper functions to easily interact with Azure table storage and Cosmos
 
 :high_brightness: Register the library with your Microsoft dependency injection
 
-This will register the connectivity as a named instance. So you can register as much as named clients as you wish in your application.
+This will register the connectivity as a named instance. So you can register as much as named clients as you wish in your application.</br>
+In the below example `ProductsDomain` is the named client.
 
 ```csharp
 
@@ -47,9 +48,9 @@ var host = Host.CreateDefaultBuilder()
     
 ```
 
-:high_brightness: Inject the dependencies `IQueryService` or `ICommandService` or both to your class
+:high_brightness: Inject the dependencies `IQueryService` or `ICommandService` or both to your class.
 
-:high_brightness: Use the respective methods to interact with the table
+:high_brightness: Use the respective methods to interact with the table.
 
 ### Queries
 
@@ -57,8 +58,8 @@ var host = Host.CreateDefaultBuilder()
 
 // queries
 var readOp = await queryService.GetEntityAsync<ProductDataModel>(
-        "ProductsDomain, // the named client
-        "products, // the table name
+        "ProductsDomain", // the named client
+        "products", // the table name
         "TECH", // partition key
         "PROD1", // row key
         new CancellationToken()
@@ -79,10 +80,10 @@ readOp.Response switch
 
 ```csharp
 
-// queries
+// commands
 var productDataModel = ProductDataModel.New("TECH", "PROD1", 259.99d);
 var commandOp = await commandService.UpsertAsync(
-    "ProductDoman", // named client
+    "ProductsDomain", // named client
     "products", // table name
     productDataModel, // table entity to upsert
     new CancellationToken()
@@ -98,6 +99,8 @@ commandOp.Operation switch
   }
 
 ```
+
+:high_brightness: and, that's it!
 
 ## Attributions
 
