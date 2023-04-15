@@ -1,5 +1,6 @@
 ﻿using Azure.Data.Tables;
 using Azure.Storage.Table.Wrapper.Commands;
+using Azure.Storage.Table.Wrapper.Core;
 using Azure.Storage.Table.Wrapper.Queries;
 using Example.Console;
 using Microsoft.Extensions.Azure;
@@ -13,19 +14,12 @@ const string table = "products";
 var host = Host.CreateDefaultBuilder()
     .ConfigureServices(services =>
     {
-        //services.RegisterTablesWithConnectionString(category, "UseDevelopmentStorage=true");
-
-        services.AddAzureClients(
-            builder =>
-                builder.AddTableServiceClient("UseDevelopmentStorage=true").WithName(category)
-        );
+        services.RegisterTablesWithConnectionString(category, "UseDevelopmentStorage=true");
     })
     .Build();
 
-var factory = host.Services.GetRequiredService<IAzureClientFactory<TableServiceClient>>();
-
-// var queryService = host.Services.GetRequiredService<IQueryService>();
-// var commandService = host.Services.GetRequiredService<ICommandService>();
+var queryService = host.Services.GetRequiredService<IQueryService>();
+var commandService = host.Services.GetRequiredService<ICommandService>();
 
 await AddProductAsync();
 await GetProductAsync();
@@ -39,8 +33,7 @@ async Task GetProductListAsync()
             .Range(1, 10)
             .Select(
                 x =>
-                    CommandExtensions.UpsertAsync(
-                        factory,
+                    commandService.UpsertAsync(
                         category,
                         table,
                         ProductDataModel.New("TECH", x.ToString(), x),
@@ -49,8 +42,7 @@ async Task GetProductListAsync()
             )
     );
 
-    var op = await Queries.QueryExtensions.GetEntityListAsync<ProductDataModel>(
-        factory,
+    var op = await queryService.GetEntityListAsync<ProductDataModel>(
         category,
         table,
         x => x.Category == "TECH",
@@ -71,16 +63,14 @@ async Task GetProductListAsync()
 async Task GetProductAsync()
 {
     var productDataModel = ProductDataModel.New("TECH", "PROD1", 259.99d);
-    var _ = await CommandExtensions.UpsertAsync(
-        factory,
+    var _ = await commandService.UpsertAsync(
         category,
         table,
         productDataModel,
         new CancellationToken()
     );
 
-    var op = await Queries.QueryExtensions.GetEntityAsync<ProductDataModel>(
-        factory,
+    var op = await queryService.GetEntityAsync<ProductDataModel>(
         category,
         table,
         "TECH",
@@ -101,8 +91,7 @@ async Task GetProductAsync()
 async Task AddProductAsync()
 {
     var productDataModel = ProductDataModel.New("TECH", "PROD1", 259.99d);
-    var op = await CommandExtensions.UpsertAsync(
-        factory,
+    var op = await commandService.UpsertAsync(
         category,
         table,
         productDataModel,
@@ -123,8 +112,7 @@ async Task AddProductAsync()
 async Task UpdateProductAsync()
 {
     var productDataModel = ProductDataModel.New("TECH", "PROD1", 259.99d);
-    var insertOp = await CommandExtensions.UpsertAsync(
-        factory,
+    var insertOp = await commandService.UpsertAsync(
         category,
         table,
         productDataModel,
@@ -141,8 +129,7 @@ async Task UpdateProductAsync()
         }
     );
 
-    var updateOp = await CommandExtensions.UpdateAsync(
-        factory,
+    var updateOp = await commandService.UpdateAsync(
         category,
         table,
         ProductDataModel.New("TECH", "PROD1", 100.50d),
