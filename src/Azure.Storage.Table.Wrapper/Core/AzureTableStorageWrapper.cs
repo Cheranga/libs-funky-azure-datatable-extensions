@@ -25,8 +25,8 @@ internal static class AzureTableStorageWrapper
             );
 
     public static Eff<TableClient> GetTableClient(TableServiceClient serviceClient, string table) =>
-        (
-            from tc in EffMaybe<TableClient>(() => serviceClient.GetTableClient(table))
-            select tc
-        ).MapFail(ex => Error.New(ErrorCodes.TableUnavailable, ErrorMessages.TableUnavailable, ex));
+        EffMaybe<TableClient>(() => serviceClient.GetTableClient(table))
+            .MapFail(
+                ex => Error.New(ErrorCodes.TableUnavailable, ErrorMessages.TableUnavailable, ex)
+            );
 }
