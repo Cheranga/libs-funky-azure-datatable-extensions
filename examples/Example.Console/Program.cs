@@ -1,12 +1,9 @@
-﻿using Azure.Data.Tables;
-using Azure.Storage.Table.Wrapper.Commands;
+﻿using Azure.Storage.Table.Wrapper.Commands;
 using Azure.Storage.Table.Wrapper.Core;
 using Azure.Storage.Table.Wrapper.Queries;
 using Example.Console;
-using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Queries = Azure.Storage.Table.Wrapper.Queries;
 
 const string category = "ProductsCategory";
 const string table = "products";
