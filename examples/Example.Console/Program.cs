@@ -16,7 +16,8 @@ var host = Host.CreateDefaultBuilder()
         //services.RegisterTablesWithConnectionString(category, "UseDevelopmentStorage=true");
 
         services.AddAzureClients(
-            builder => builder.AddTableServiceClient("UseDevelopmentStorage=true").WithName(category)
+            builder =>
+                builder.AddTableServiceClient("UseDevelopmentStorage=true").WithName(category)
         );
     })
     .Build();
@@ -70,7 +71,13 @@ async Task GetProductListAsync()
 async Task GetProductAsync()
 {
     var productDataModel = ProductDataModel.New("TECH", "PROD1", 259.99d);
-    var _ = await CommandExtensions.UpsertAsync(factory,category, table, productDataModel, new CancellationToken());
+    var _ = await CommandExtensions.UpsertAsync(
+        factory,
+        category,
+        table,
+        productDataModel,
+        new CancellationToken()
+    );
 
     var op = await Queries.QueryExtensions.GetEntityAsync<ProductDataModel>(
         factory,
@@ -94,7 +101,13 @@ async Task GetProductAsync()
 async Task AddProductAsync()
 {
     var productDataModel = ProductDataModel.New("TECH", "PROD1", 259.99d);
-    var op = await CommandExtensions.UpsertAsync(factory, category, table, productDataModel, new CancellationToken());
+    var op = await CommandExtensions.UpsertAsync(
+        factory,
+        category,
+        table,
+        productDataModel,
+        new CancellationToken()
+    );
 
     Console.WriteLine(
         op.Operation switch
