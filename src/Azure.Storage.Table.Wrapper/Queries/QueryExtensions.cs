@@ -24,8 +24,8 @@ public static class QueryExtensions
         CancellationToken token = new()
     )
         where T : class, ITableEntity =>
-    (
-        await (
+        (
+            await (
                 from _1 in ValidateEmptyString(category)
                 from _2 in ValidateEmptyString(table)
                 from _3 in ValidateEmptyString(partitionKey)
@@ -37,9 +37,9 @@ public static class QueryExtensions
                 )
                 select op
             )
-            .Match(GetSingle, GetError<T>)
-            .Run()
-    ).Match(op => op, GetError<T>);
+                .Match(GetSingle, GetError<T>)
+                .Run()
+        ).Match(op => op, GetError<T>);
 
     public static async Task<
         QueryResponse<QueryFailedResult, EmptyResult, SingleResult<T>, CollectionResult<T>>
@@ -51,18 +51,18 @@ public static class QueryExtensions
         CancellationToken token
     )
         where T : class, ITableEntity =>
-    (
-        await (
-            from _1 in ValidateEmptyString(category)
-            from _2 in ValidateEmptyString(table)
-            from tc in TableClient(factory, category, table)
-            from records in Aff(
-                async () =>
-                    await tc.QueryAsync<T>(filter, cancellationToken: token).ToListAsync(token)
-            )
-            select records?.ToList() ?? new List<T>()
-        ).Run()
-    ).Match(GetCollection, GetCollectionError<T>);
+        (
+            await (
+                from _1 in ValidateEmptyString(category)
+                from _2 in ValidateEmptyString(table)
+                from tc in TableClient(factory, category, table)
+                from records in Aff(
+                    async () =>
+                        await tc.QueryAsync<T>(filter, cancellationToken: token).ToListAsync(token)
+                )
+                select records?.ToList() ?? new List<T>()
+            ).Run()
+        ).Match(GetCollection, GetCollectionError<T>);
 
     private static Eff<Unit> ValidateEmptyString(string s) =>
         from _1 in guardnot(
@@ -84,7 +84,7 @@ public static class QueryExtensions
         error.ToException() switch
         {
             RequestFailedException rf
-                => rf.Status == (int) HttpStatusCode.NotFound
+                => rf.Status == (int)HttpStatusCode.NotFound
                     ? Empty()
                     : Fail(
                         Error.New(
@@ -98,7 +98,9 @@ public static class QueryExtensions
 
     private static QueryResponse<
         QueryFailedResult,
-        EmptyResult, SingleResult<T>, CollectionResult<T>
+        EmptyResult,
+        SingleResult<T>,
+        CollectionResult<T>
     > GetCollectionError<T>(Error error)
         where T : class, ITableEntity =>
         Fail(
@@ -111,7 +113,9 @@ public static class QueryExtensions
 
     private static QueryResponse<
         QueryFailedResult,
-        EmptyResult, SingleResult<T>, CollectionResult<T>
+        EmptyResult,
+        SingleResult<T>,
+        CollectionResult<T>
     > GetCollection<T>(List<T> items)
         where T : class, ITableEntity =>
         items.Count switch
