@@ -2,7 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using Azure.Data.Tables;
 using LanguageExt.Common;
 
-namespace Azure.Storage.Table.Wrapper.Queries;
+namespace Funky.Azure.DataTable.Extensions.Queries;
 
 [ExcludeFromCodeCoverage]
 public abstract class QueryResult

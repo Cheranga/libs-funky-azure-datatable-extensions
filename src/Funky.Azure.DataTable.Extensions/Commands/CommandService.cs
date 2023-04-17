@@ -1,8 +1,8 @@
 ﻿using Azure.Data.Tables;
 using Microsoft.Extensions.Azure;
-using static Azure.Storage.Table.Wrapper.Commands.CommandOperation;
+using static Funky.Azure.DataTable.Extensions.Commands.CommandOperation;
 
-namespace Azure.Storage.Table.Wrapper.Commands;
+namespace Funky.Azure.DataTable.Extensions.Commands;
 
 public class CommandService : ICommandService
 {

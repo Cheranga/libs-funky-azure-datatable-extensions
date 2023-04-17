@@ -8,11 +8,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\src\Azure.Storage.Table.Wrapper\Azure.Storage.Table.Wrapper.csproj"/>
+        <ProjectReference Include="..\..\src\Funky.Azure.DataTable.Extensions\Funky.Azure.DataTable.Extensions.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.1"/>
+        <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.1" />
     </ItemGroup>
 
 </Project>

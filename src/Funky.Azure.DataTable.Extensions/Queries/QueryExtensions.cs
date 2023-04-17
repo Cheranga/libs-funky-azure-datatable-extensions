@@ -1,15 +1,16 @@
 ﻿using System.Linq.Expressions;
 using System.Net;
+using Azure;
 using Azure.Data.Tables;
-using Azure.Storage.Table.Wrapper.Core;
+using Funky.Azure.DataTable.Extensions.Core;
 using LanguageExt;
 using LanguageExt.Common;
 using Microsoft.Extensions.Azure;
-using static Azure.Storage.Table.Wrapper.Core.AzureTableStorageWrapper;
+using static Funky.Azure.DataTable.Extensions.Core.AzureTableStorageWrapper;
 using static LanguageExt.Prelude;
-using static Azure.Storage.Table.Wrapper.Queries.QueryResult;
+using static Funky.Azure.DataTable.Extensions.Queries.QueryResult;
 
-namespace Azure.Storage.Table.Wrapper.Queries;
+namespace Funky.Azure.DataTable.Extensions.Queries;
 
 public static class QueryExtensions
 {

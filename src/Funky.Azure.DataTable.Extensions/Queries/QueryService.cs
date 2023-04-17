@@ -1,9 +1,9 @@
 ﻿using System.Linq.Expressions;
 using Azure.Data.Tables;
 using Microsoft.Extensions.Azure;
-using static Azure.Storage.Table.Wrapper.Queries.QueryResult;
+using static Funky.Azure.DataTable.Extensions.Queries.QueryResult;
 
-namespace Azure.Storage.Table.Wrapper.Queries;
+namespace Funky.Azure.DataTable.Extensions.Queries;
 
 internal class QueryService : IQueryService
 {

@@ -1,11 +1,11 @@
 using System.Diagnostics.CodeAnalysis;
 using Azure.Identity;
-using Azure.Storage.Table.Wrapper.Commands;
-using Azure.Storage.Table.Wrapper.Queries;
+using Funky.Azure.DataTable.Extensions.Commands;
+using Funky.Azure.DataTable.Extensions.Queries;
 using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Azure.Storage.Table.Wrapper.Core;
+namespace Funky.Azure.DataTable.Extensions.Core;
 
 [ExcludeFromCodeCoverage]
 public static class Bootstrapper

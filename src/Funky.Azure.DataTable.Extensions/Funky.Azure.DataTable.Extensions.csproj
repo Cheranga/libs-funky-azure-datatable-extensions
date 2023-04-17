@@ -4,13 +4,13 @@
         <TargetFramework>netstandard2.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <RepositoryUrl>https://github.com/Cheranga/libs-azure.storage.table.wrapper</RepositoryUrl>
-        <PackageId>CCHAT.Azure.Storage.Table.Wrapper</PackageId>
+        <RepositoryUrl>https://github.com/Cheranga/libs-funky-azure-datatable-extensions</RepositoryUrl>
+        <PackageId>Funky.Azure.DataTable.Extensions</PackageId>
         <Authors>Cheranga Hatangala</Authors>
         <LangVersion>10</LangVersion>
         <Version />
-        <Title>CCHAT.Azure.Storage.Table.Wrapper</Title>
-        <PackageProjectUrl>https://github.com/Cheranga/libs-azure.storage.table.wrapper</PackageProjectUrl>
+        <Title>Funky.Azure.DataTable.Extensions</Title>
+        <PackageProjectUrl>https://github.com/Cheranga/libs-funky-azure-datatable-extensions</PackageProjectUrl>
     </PropertyGroup>
 
     <ItemGroup>
@@ -28,7 +28,7 @@
 
     <ItemGroup>
         <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
-            <_Parameter1>Azure.Storage.Table.Wrapper.Tests</_Parameter1>
+            <_Parameter1>Funky.Azure.DataTable.Extensions.Tests</_Parameter1>
         </AssemblyAttribute>
     </ItemGroup>
 

@@ -1,6 +1,6 @@
-﻿using Azure.Storage.Table.Wrapper.Commands;
-using Azure.Storage.Table.Wrapper.Core;
-using Azure.Storage.Table.Wrapper.Queries;
+﻿using Funky.Azure.DataTable.Extensions.Commands;
+using Funky.Azure.DataTable.Extensions.Core;
+using Funky.Azure.DataTable.Extensions.Queries;
 using Example.Console;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;

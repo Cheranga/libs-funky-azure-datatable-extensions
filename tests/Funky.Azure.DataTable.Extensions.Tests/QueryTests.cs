@@ -1,12 +1,13 @@
 ﻿using System.Net;
+using Azure;
 using Azure.Data.Tables;
-using Azure.Storage.Table.Wrapper.Core;
-using Azure.Storage.Table.Wrapper.Queries;
+using Funky.Azure.DataTable.Extensions.Core;
+using Funky.Azure.DataTable.Extensions.Queries;
 using FluentAssertions;
 using Microsoft.Extensions.Azure;
 using Moq;
 
-namespace Azure.Storage.Table.Wrapper.Tests;
+namespace Funky.Azure.DataTable.Extensions.Tests;
 
 public static class QueryTests
 {
