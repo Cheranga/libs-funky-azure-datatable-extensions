@@ -1,8 +1,8 @@
 ﻿using System.Linq.Expressions;
 using Azure.Data.Tables;
-using static Azure.Storage.Table.Wrapper.Queries.QueryResult;
+using static Funky.Azure.DataTable.Extensions.Queries.QueryResult;
 
-namespace Azure.Storage.Table.Wrapper.Queries;
+namespace Funky.Azure.DataTable.Extensions.Queries;
 
 public interface IQueryService
 {

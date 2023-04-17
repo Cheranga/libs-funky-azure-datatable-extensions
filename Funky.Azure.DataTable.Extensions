@@ -1,10 +1,10 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Azure.Storage.Table.Wrapper", "src\Azure.Storage.Table.Wrapper\Azure.Storage.Table.Wrapper.csproj", "{D9BBCDEB-7662-436D-957B-FB18078CE798}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Funky.Azure.DataTable.Extensions", "src\Funky.Azure.DataTable.Extensions\Funky.Azure.DataTable.Extensions.csproj", "{D9BBCDEB-7662-436D-957B-FB18078CE798}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Example.Console", "examples\Example.Console\Example.Console.csproj", "{5B938F29-22A5-48F9-9BC3-C2041DE5CE35}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Azure.Storage.Table.Wrapper.Tests", "tests\Azure.Storage.Table.Wrapper.Tests\Azure.Storage.Table.Wrapper.Tests.csproj", "{CC25EC87-6934-45E9-9D4D-74D53A0B0914}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Funky.Azure.DataTable.Extensions.Tests", "tests\Funky.Azure.DataTable.Extensions.Tests\Funky.Azure.DataTable.Extensions.Tests.csproj", "{CC25EC87-6934-45E9-9D4D-74D53A0B0914}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

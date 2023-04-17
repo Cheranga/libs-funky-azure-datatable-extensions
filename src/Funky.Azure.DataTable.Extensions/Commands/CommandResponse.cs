@@ -1,4 +1,4 @@
-﻿namespace Azure.Storage.Table.Wrapper.Commands;
+﻿namespace Funky.Azure.DataTable.Extensions.Commands;
 
 public class CommandResponse<TA, TB>
     where TA : CommandOperation

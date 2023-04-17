@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using LanguageExt.Common;
 
-namespace Azure.Storage.Table.Wrapper.Commands;
+namespace Funky.Azure.DataTable.Extensions.Commands;
 
 [ExcludeFromCodeCoverage]
 public abstract class CommandOperation

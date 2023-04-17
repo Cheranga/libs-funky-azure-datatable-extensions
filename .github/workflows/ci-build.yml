@@ -14,7 +14,7 @@ jobs:
     strategy:
       matrix:
         project-name:
-          - Azure.Storage.Table.Wrapper
+          - Funky.Azure.DataTable.Extensions
     steps:
       - uses: actions/checkout@v3
       - name: Setup .NET

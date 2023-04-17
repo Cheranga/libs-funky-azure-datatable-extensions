@@ -1,4 +1,4 @@
-namespace Azure.Storage.Table.Wrapper.Core;
+namespace Funky.Azure.DataTable.Extensions.Core;
 
 public static class ErrorCodes
 {

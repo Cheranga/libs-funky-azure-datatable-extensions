@@ -3,9 +3,9 @@
 
 <img src="data-table.png" alt="TypedSpark.NET" width="150px"/>
 
-# Azure Data Table Wrapper
+# Funky Azure Data Table Extensions
 
-Wrapper functions to easily interact with Azure table storage and Cosmos
+Functions to easily interact with Azure table storage and Cosmos. The library has been developed using C# with functional style programming.
 
 </div>
 
@@ -110,7 +110,7 @@ updateOp.Operation switch
 
 :high_brightness: Install package and configure
 
-Install the `CCHAT.Azure.Storage.Table.Wrapper` from nuget. </br>
+Install the `Funky.Azure.DataTable.Extensions` from nuget. </br>
 Then register it as a dependency either using `RegisterTablesWithConnectionString` or `RegisterTablesWithManagedIdentity`. </p>
 
 This will allow you to register the `TableServiceClient` as a named instance. </p>

@@ -1,4 +1,4 @@
-﻿namespace Azure.Storage.Table.Wrapper.Queries;
+﻿namespace Funky.Azure.DataTable.Extensions.Queries;
 
 public class QueryResponse<TA, TB, TC>
     where TA : QueryResult

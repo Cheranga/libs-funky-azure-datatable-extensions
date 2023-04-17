@@ -1,13 +1,14 @@
-﻿using Azure.Data.Tables;
-using Azure.Storage.Table.Wrapper.Core;
+﻿using Azure;
+using Azure.Data.Tables;
+using Funky.Azure.DataTable.Extensions.Core;
 using LanguageExt;
 using LanguageExt.Common;
 using Microsoft.Extensions.Azure;
 using static LanguageExt.Prelude;
-using static Azure.Storage.Table.Wrapper.Core.AzureTableStorageWrapper;
-using static Azure.Storage.Table.Wrapper.Commands.CommandOperation;
+using static Funky.Azure.DataTable.Extensions.Core.AzureTableStorageWrapper;
+using static Funky.Azure.DataTable.Extensions.Commands.CommandOperation;
 
-namespace Azure.Storage.Table.Wrapper.Commands;
+namespace Funky.Azure.DataTable.Extensions.Commands;
 
 public static class CommandExtensions
 {

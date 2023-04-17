@@ -5,7 +5,7 @@ using LanguageExt.Common;
 using Microsoft.Extensions.Azure;
 using static LanguageExt.Prelude;
 
-namespace Azure.Storage.Table.Wrapper.Core;
+namespace Funky.Azure.DataTable.Extensions.Core;
 
 [ExcludeFromCodeCoverage]
 internal static class AzureTableStorageWrapper

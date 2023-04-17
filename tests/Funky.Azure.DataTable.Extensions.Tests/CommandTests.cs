@@ -1,11 +1,11 @@
 ﻿using Azure.Data.Tables;
-using Azure.Storage.Table.Wrapper.Commands;
-using Azure.Storage.Table.Wrapper.Core;
+using Funky.Azure.DataTable.Extensions.Commands;
+using Funky.Azure.DataTable.Extensions.Core;
 using FluentAssertions;
 using Microsoft.Extensions.Azure;
 using Moq;
 
-namespace Azure.Storage.Table.Wrapper.Tests;
+namespace Funky.Azure.DataTable.Extensions.Tests;
 
 public static class CommandTests
 {

@@ -1,6 +1,7 @@
-﻿using Azure.Data.Tables;
+﻿using Azure;
+using Azure.Data.Tables;
 
-namespace Azure.Storage.Table.Wrapper.Tests;
+namespace Funky.Azure.DataTable.Extensions.Tests;
 
 public record ProductDataModel : ITableEntity
 {

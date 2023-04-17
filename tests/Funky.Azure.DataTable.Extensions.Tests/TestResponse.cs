@@ -1,7 +1,8 @@
 ﻿using System.Net;
+using Azure;
 using Azure.Core;
 
-namespace Azure.Storage.Table.Wrapper.Tests;
+namespace Funky.Azure.DataTable.Extensions.Tests;
 
 public class TestResponse : Response
 {
