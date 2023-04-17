@@ -8,9 +8,9 @@ public abstract class CommandOperation
 {
     private CommandOperation() { }
 
-    internal static CommandSuccessOperation Success() => CommandSuccessOperation.New();
+    public static CommandSuccessOperation Success() => CommandSuccessOperation.New();
 
-    internal static CommandFailedOperation Fail(Error error) => CommandFailedOperation.New(error);
+    public static CommandFailedOperation Fail(Error error) => CommandFailedOperation.New(error);
 
     public sealed class CommandSuccessOperation : CommandOperation
     {
