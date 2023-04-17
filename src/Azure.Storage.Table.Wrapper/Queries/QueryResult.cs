@@ -7,14 +7,14 @@ namespace Azure.Storage.Table.Wrapper.Queries;
 [ExcludeFromCodeCoverage]
 public abstract class QueryResult
 {
-    internal static QueryFailedResult Fail(Error error) => QueryFailedResult.New(error);
+    public static QueryFailedResult Fail(Error error) => QueryFailedResult.New(error);
 
-    internal static EmptyResult Empty() => EmptyResult.New();
+    public static EmptyResult Empty() => EmptyResult.New();
 
-    internal static SingleResult<T> Single<T>(T data)
+    public static SingleResult<T> Single<T>(T data)
         where T : class, ITableEntity => SingleResult<T>.New(data);
 
-    internal static CollectionResult<T> Collection<T>(IEnumerable<T> data)
+    public static CollectionResult<T> Collection<T>(IEnumerable<T> data)
         where T : class, ITableEntity => CollectionResult<T>.New(data);
 
     public sealed class EmptyResult : QueryResult
