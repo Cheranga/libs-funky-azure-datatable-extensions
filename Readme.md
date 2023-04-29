@@ -189,6 +189,9 @@ commandOp.Operation switch
 
 :high_brightness: That's it!
 
+## Differences between table storage, and cosmos table API
+There are some behaviour in Azure table storage, and in Azure Cosmos table API. Please refer the [official documentation](https://learn.microsoft.com/en-us/azure/cosmos-db/table/table-api-faq#where-is-api-for-table-not-identical-with-azure-table-storage-behavior-) for this
+
 ## Attributions
 
 [Icons created by juicy_fish](https://www.flaticon.com/free-icon/data-table_3575798)
