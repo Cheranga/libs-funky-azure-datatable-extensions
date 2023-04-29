@@ -7,7 +7,7 @@ namespace Funky.Azure.DataTable.Extensions.Tests;
 public record ProductDataModel : ITableEntity
 {
     public string Category { get; set; } = string.Empty;
-    
+
     [JsonProperty("ProductId")]
     public string Id { get; set; } = string.Empty;
     public double Price { get; set; }

@@ -1,4 +1,5 @@
-﻿using Azure.Data.Tables;using Funky.Azure.DataTable.Extensions.Commands;
+﻿using Azure.Data.Tables;
+using Funky.Azure.DataTable.Extensions.Commands;
 using Funky.Azure.DataTable.Extensions.Core;
 using Funky.Azure.DataTable.Extensions.Queries;
 using Example.Console;
