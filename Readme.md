@@ -5,7 +5,7 @@
 
 # Funky Azure Data Table Extensions
 
-Functions to easily interact with Azure table storage and Cosmos. The library has been developed using C# with functional style programming.
+Functions to easily interact with **Azure table storage** and **Cosmos Table API**. The library has been developed using C# with functional style programming.
 
 </div>
 
