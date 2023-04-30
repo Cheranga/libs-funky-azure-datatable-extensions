@@ -12,6 +12,16 @@ Functions to easily interact with Azure table storage and Cosmos. The library ha
 > The library uses Microsoft's `Azure.Data.Tables` package to perform data operations.</p>
 > The library separates commands and queries, and provides separate methods to be used easily on your data tables.
 
+<!-- TOC -->
+* [Funky Azure Data Table Extensions](#funky-azure-data-table-extensions)
+  * [:tada: Features](#tada-features)
+  * [:tada: Query Usages](#tada-query-usages)
+  * [:tada: Command Usages](#tada-command-usages)
+  * [Using the library in your solutions](#using-the-library-in-your-solutions)
+  * [Differences between table storage, and cosmos table API](#differences-between-table-storage-and-cosmos-table-api)
+  * [Attributions](#attributions)
+<!-- TOC -->
+
 ## :tada: Features
 
 :bulb: Separation of command and query operations.
@@ -20,9 +30,13 @@ Functions to easily interact with Azure table storage and Cosmos. The library ha
 
 :bulb: Support for either managed identity or connection string through dependency injection.
 
-## :tada: Usages
+:bulb: Use single named table service client for commands and queries (`ICommandService` and `IQueryService`).
 
-:high_brightness: Query with partition and row key
+:bulb: Use multiple named table service clients with `CommandExtensions` and `QueryExtensions`.
+
+## :tada: Query Usages
+
+:high_brightness: With partition and row key
 
 Use the `GetEntityAsync` method in `IQueryService` for this.
 ```csharp
@@ -44,7 +58,7 @@ op.Response switch
 };
 ```
 
-:high_brightness: Query with LINQ expressions
+:high_brightness: With LINQ expressions
 
 Use the `GetEntityListAsync` in `IQueryService` for this.
 
@@ -66,6 +80,8 @@ op.Response switch
     _ => // handle things more
 };
 ```
+
+## :tada: Command Usages
 
 :high_brightness: Upsert an entity
 
@@ -106,7 +122,7 @@ updateOp.Operation switch
     _ => // handle things more
 };
 ```
-## How to use it
+## Using the library in your solutions
 
 :high_brightness: Install package and configure
 
@@ -138,56 +154,14 @@ var host = Host.CreateDefaultBuilder()
 ```
 
 :high_brightness: Inject the dependencies `IQueryService` or `ICommandService` or both to your class.
+> Use this approach **ONLY** if you need only a single table service client for both queries and commands.
 
-:high_brightness: Use the respective methods to interact with the table.
+**Refer [:tada: Command Usages](#tada-command-usages) for commands, and [:tada: Query Usages](#tada-query-usages) for queries using this approach.**
 
-### Queries
+:high_brightness: OR register your own named `IAzureClientFactory<TableServiceClient>` dependency and use `QueryExtensions` and `CommandExtensions`.
 
-```csharp
-
-// queries
-var readOp = await queryService.GetEntityAsync<ProductDataModel>(
-        "ProductsDomain", // the named client
-        "products", // the table name
-        "TECH", // partition key
-        "PROD1", // row key
-        new CancellationToken()
-    );
-
-// depending on the response, you can decide what to do next
-readOp.Response switch
-      {
-          QueryResult.SingleResult<ProductDataModel> r => GetSuccessResponse(r),
-          QueryResult.QueryFailedResult f => GetFailedResponse(f),
-          _ => GetServerErrorResponse()
-      }
-
-```
-
-### Commands
-
-```csharp
-
-// commands
-var productDataModel = ProductDataModel.New("TECH", "PROD1", 259.99d);
-var commandOp = await commandService.UpsertAsync(
-    "ProductsDomain", // named client
-    "products", // table name
-    productDataModel, // table entity to upsert
-    new CancellationToken()
-);
-
-// depending on the response, you can decide what to do next
-commandOp.Operation switch
-  {
-      CommandOperation.CommandSuccessOperation _ => // do stuff,
-      CommandOperation.CommandFailedOperation f => // do error stuff,
-      _ => throw new NotSupportedException()
-  }
-
-```
-
-:high_brightness: That's it!
+## Differences between table storage, and cosmos table API
+There are some behaviour in Azure table storage, and in Azure Cosmos table API. Please refer the [official documentation](https://learn.microsoft.com/en-us/azure/cosmos-db/table/table-api-faq#where-is-api-for-table-not-identical-with-azure-table-storage-behavior-) for this
 
 ## Attributions
 

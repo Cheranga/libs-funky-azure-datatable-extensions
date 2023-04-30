@@ -6,6 +6,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Example.Console", "examples
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Funky.Azure.DataTable.Extensions.Tests", "tests\Funky.Azure.DataTable.Extensions.Tests\Funky.Azure.DataTable.Extensions.Tests.csproj", "{CC25EC87-6934-45E9-9D4D-74D53A0B0914}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Example.Cosmos.Console", "Example.Cosmos.Console\Example.Cosmos.Console.csproj", "{3709A32F-769F-44E8-81BA-836527F0741A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{CEECD258-2D2A-4B32-A8D9-3F7715ED11F2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{E972A974-0BEF-48E0-AA6A-36A098F013FB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +30,14 @@ Global
 		{CC25EC87-6934-45E9-9D4D-74D53A0B0914}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CC25EC87-6934-45E9-9D4D-74D53A0B0914}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CC25EC87-6934-45E9-9D4D-74D53A0B0914}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3709A32F-769F-44E8-81BA-836527F0741A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3709A32F-769F-44E8-81BA-836527F0741A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3709A32F-769F-44E8-81BA-836527F0741A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3709A32F-769F-44E8-81BA-836527F0741A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{5B938F29-22A5-48F9-9BC3-C2041DE5CE35} = {CEECD258-2D2A-4B32-A8D9-3F7715ED11F2}
+		{3709A32F-769F-44E8-81BA-836527F0741A} = {CEECD258-2D2A-4B32-A8D9-3F7715ED11F2}
+		{CC25EC87-6934-45E9-9D4D-74D53A0B0914} = {E972A974-0BEF-48E0-AA6A-36A098F013FB}
 	EndGlobalSection
 EndGlobal
