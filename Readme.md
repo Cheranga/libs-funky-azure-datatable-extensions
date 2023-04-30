@@ -18,8 +18,6 @@ Functions to easily interact with Azure table storage and Cosmos. The library ha
   * [:tada: Query Usages](#tada-query-usages)
   * [:tada: Command Usages](#tada-command-usages)
   * [Using the library in your solutions](#using-the-library-in-your-solutions)
-    * [Queries](#queries)
-    * [Commands](#commands)
   * [Differences between table storage, and cosmos table API](#differences-between-table-storage-and-cosmos-table-api)
   * [Attributions](#attributions)
 <!-- TOC -->
