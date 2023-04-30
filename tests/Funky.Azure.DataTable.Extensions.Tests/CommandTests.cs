@@ -41,8 +41,7 @@ public static class CommandTests
         response.ErrorCode.Should().Be(ErrorCodes.TableUnavailable);
         response.ErrorMessage.Should().Be(ErrorMessages.TableUnavailable);
     }
-    
-    
+
     [Fact(DisplayName = "Upsert is unsuccessful")]
     public static async Task UpsertFails()
     {
