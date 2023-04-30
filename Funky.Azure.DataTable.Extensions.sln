@@ -6,7 +6,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Example.Console", "examples
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Funky.Azure.DataTable.Extensions.Tests", "tests\Funky.Azure.DataTable.Extensions.Tests\Funky.Azure.DataTable.Extensions.Tests.csproj", "{CC25EC87-6934-45E9-9D4D-74D53A0B0914}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Example.Cosmos.Console", "Example.Cosmos.Console\Example.Cosmos.Console.csproj", "{3709A32F-769F-44E8-81BA-836527F0741A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Example.Cosmos.Console", "examples\Example.Cosmos.Console\Example.Cosmos.Console.csproj", "{3709A32F-769F-44E8-81BA-836527F0741A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{CEECD258-2D2A-4B32-A8D9-3F7715ED11F2}"
 EndProject

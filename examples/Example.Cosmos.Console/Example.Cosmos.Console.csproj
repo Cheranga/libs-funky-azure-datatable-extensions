@@ -13,7 +13,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\src\Funky.Azure.DataTable.Extensions\Funky.Azure.DataTable.Extensions.csproj" />
+      <ProjectReference Include="..\..\src\Funky.Azure.DataTable.Extensions\Funky.Azure.DataTable.Extensions.csproj" />
     </ItemGroup>
-
 </Project>
