@@ -126,7 +126,7 @@ public static class QueryExtensions
             _ => Collection(items)
         };
 
-    private static Eff<TableClient> TableClient(
+    private static Aff<TableClient> TableClient(
         IAzureClientFactory<TableServiceClient> factory,
         string category,
         string table

@@ -1,9 +1,10 @@
 ﻿using System.Net;
 using Azure;
 using Azure.Data.Tables;
+using Azure.Data.Tables.Models;
+using FluentAssertions;
 using Funky.Azure.DataTable.Extensions.Core;
 using Funky.Azure.DataTable.Extensions.Queries;
-using FluentAssertions;
 using Microsoft.Extensions.Azure;
 using Moq;
 
@@ -11,6 +12,39 @@ namespace Funky.Azure.DataTable.Extensions.Tests;
 
 public static class QueryTests
 {
+    [Fact(DisplayName = "Table does not exists")]
+    public static async Task TableDoesNotExists()
+    {
+        var tableClient = new Mock<TableClient>();
+        tableClient
+            .Setup(x => x.GetAccessPoliciesAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(
+                TestResponse<IReadOnlyList<TableSignedIdentifier>>.Fail("table does not exist")
+            );
+        var tableServiceClient = new Mock<TableServiceClient>();
+        tableServiceClient.Setup(x => x.GetTableClient("test")).Returns(tableClient.Object);
+
+        var factory = new Mock<IAzureClientFactory<TableServiceClient>>();
+        factory.Setup(x => x.CreateClient("test")).Returns(tableServiceClient.Object);
+        var tableService = new QueryService(factory.Object);
+        var op = await tableService.GetEntityAsync<ProductDataModel>(
+            "test",
+            "products",
+            "TECH",
+            "PROD1",
+            new CancellationToken()
+        );
+
+        var response = op.Response switch
+        {
+            QueryResult.QueryFailedResult err => new { err.ErrorCode, err.ErrorMessage },
+            _ => new { ErrorCode = -1, ErrorMessage = "error" }
+        };
+
+        response.ErrorCode.Should().Be(ErrorCodes.TableUnavailable);
+        response.ErrorMessage.Should().Be(ErrorMessages.TableUnavailable);
+    }
+
     [Fact(DisplayName = "Get an existing entity from table")]
     public static async Task GetExistingEntity()
     {
@@ -27,6 +61,13 @@ public static class QueryTests
             )
             .ReturnsAsync(
                 TestResponse<ProductDataModel>.Success(ProductDataModel.New("TECH", "PROD1", 100))
+            );
+        tableClient
+            .Setup(x => x.GetAccessPoliciesAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(
+                TestResponse<IReadOnlyList<TableSignedIdentifier>>.Success(
+                    new[] { It.IsAny<TableSignedIdentifier>() }
+                )
             );
 
         var tableServiceClient = new Mock<TableServiceClient>();
@@ -69,6 +110,13 @@ public static class QueryTests
                     )
             )
             .Throws(new RequestFailedException((int)HttpStatusCode.NotFound, "entity not found"));
+        tableClient
+            .Setup(x => x.GetAccessPoliciesAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(
+                TestResponse<IReadOnlyList<TableSignedIdentifier>>.Success(
+                    new[] { It.IsAny<TableSignedIdentifier>() }
+                )
+            );
 
         var tableServiceClient = new Mock<TableServiceClient>();
         tableServiceClient.Setup(x => x.GetTableClient("products")).Returns(tableClient.Object);
@@ -123,6 +171,13 @@ public static class QueryTests
                     }
                 )
             );
+        tableClient
+            .Setup(x => x.GetAccessPoliciesAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(
+                TestResponse<IReadOnlyList<TableSignedIdentifier>>.Success(
+                    new[] { It.IsAny<TableSignedIdentifier>() }
+                )
+            );
 
         var tableServiceClient = new Mock<TableServiceClient>();
         tableServiceClient.Setup(x => x.GetTableClient("products")).Returns(tableClient.Object);
@@ -170,6 +225,13 @@ public static class QueryTests
                             It.IsAny<Response>()
                         )
                     }
+                )
+            );
+        tableClient
+            .Setup(x => x.GetAccessPoliciesAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(
+                TestResponse<IReadOnlyList<TableSignedIdentifier>>.Success(
+                    new[] { It.IsAny<TableSignedIdentifier>() }
                 )
             );
 
@@ -221,6 +283,13 @@ public static class QueryTests
                             It.IsAny<Response>()
                         )
                     }
+                )
+            );
+        tableClient
+            .Setup(x => x.GetAccessPoliciesAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(
+                TestResponse<IReadOnlyList<TableSignedIdentifier>>.Success(
+                    new[] { It.IsAny<TableSignedIdentifier>() }
                 )
             );
 
@@ -301,6 +370,13 @@ public static class QueryTests
             .Returns(
                 AsyncPageable<ProductDataModel>.FromPages(
                     Enumerable.Empty<Page<ProductDataModel>>()
+                )
+            );
+        tableClient
+            .Setup(x => x.GetAccessPoliciesAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(
+                TestResponse<IReadOnlyList<TableSignedIdentifier>>.Success(
+                    new[] { It.IsAny<TableSignedIdentifier>() }
                 )
             );
 
