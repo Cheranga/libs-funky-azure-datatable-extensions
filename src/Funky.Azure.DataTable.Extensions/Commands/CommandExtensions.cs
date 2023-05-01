@@ -34,19 +34,23 @@ public static class CommandExtensions
                 from op in AffMaybe<Response>(
                     async () => await tc.UpsertEntityAsync(data, TableUpdateMode.Replace, token)
                 )
-                from _3 in guardnot(op.IsError, Error.New(ErrorCodes.CannotUpsert, op.ReasonPhrase))
+                from _3 in guardnot(
+                    op.IsError,
+                    Error.New(ErrorCodes.CannotUpsert, ErrorMessages.CannotUpsert)
+                )
                 select op
             ).Run()
         ).Match(
             _ => Success(),
             err =>
-                Fail(
-                    Error.New(
-                        ErrorCodes.CannotUpsert,
-                        ErrorMessages.CannotUpsert,
-                        err.ToException()
-                    )
-                )
+                err.Code switch
+                {
+                    ErrorCodes.Invalid => Fail(err),
+                    ErrorCodes.UnregisteredTableService => Fail(err),
+                    ErrorCodes.TableUnavailable => Fail(err),
+                    ErrorCodes.CannotUpsert => Fail(err),
+                    _ => Fail(Error.New(ErrorCodes.CannotUpsert, ErrorMessages.CannotUpsert))
+                }
         );
 
     public static async Task<
@@ -80,13 +84,14 @@ public static class CommandExtensions
         ).Match(
             _ => Success(),
             err =>
-                Fail(
-                    Error.New(
-                        ErrorCodes.CannotUpdate,
-                        ErrorMessages.CannotUpdate,
-                        err.ToException()
-                    )
-                )
+                err.Code switch
+                {
+                    ErrorCodes.Invalid => Fail(err),
+                    ErrorCodes.UnregisteredTableService => Fail(err),
+                    ErrorCodes.TableUnavailable => Fail(err),
+                    ErrorCodes.CannotUpdate => Fail(err),
+                    _ => Fail(Error.New(ErrorCodes.CannotUpdate, ErrorMessages.CannotUpdate))
+                }
         );
 
     private static Eff<Unit> ValidateEmptyString(string s, int errorCode, string errorMessage) =>
@@ -94,7 +99,7 @@ public static class CommandExtensions
             .ToEff()
         select unit;
 
-    private static Eff<TableClient> TableClient(
+    private static Aff<TableClient> TableClient(
         IAzureClientFactory<TableServiceClient> factory,
         string category,
         string table

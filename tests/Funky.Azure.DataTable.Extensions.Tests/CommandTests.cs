@@ -1,4 +1,5 @@
 ﻿using Azure.Data.Tables;
+using Azure.Data.Tables.Models;
 using Funky.Azure.DataTable.Extensions.Commands;
 using Funky.Azure.DataTable.Extensions.Core;
 using FluentAssertions;
@@ -9,6 +10,38 @@ namespace Funky.Azure.DataTable.Extensions.Tests;
 
 public static class CommandTests
 {
+    [Fact(DisplayName = "Table does not exists")]
+    public static async Task TableDoesNotExists()
+    {
+        var tableClient = new Mock<TableClient>();
+        tableClient
+            .Setup(x => x.GetAccessPoliciesAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(
+                TestResponse<IReadOnlyList<TableSignedIdentifier>>.Fail("table does not exist")
+            );
+        var tableServiceClient = new Mock<TableServiceClient>();
+        tableServiceClient.Setup(x => x.GetTableClient("test")).Returns(tableClient.Object);
+
+        var factory = new Mock<IAzureClientFactory<TableServiceClient>>();
+        factory.Setup(x => x.CreateClient("test")).Returns(tableServiceClient.Object);
+        var commandService = new CommandService(factory.Object);
+        var op = await commandService.UpsertAsync(
+            "test",
+            "products",
+            ProductDataModel.New("tech", "prod1", 100),
+            new CancellationToken()
+        );
+
+        var response = op.Operation switch
+        {
+            CommandOperation.CommandFailedOperation err => new { err.ErrorCode, err.ErrorMessage },
+            _ => new { ErrorCode = -1, ErrorMessage = "error" }
+        };
+
+        response.ErrorCode.Should().Be(ErrorCodes.TableUnavailable);
+        response.ErrorMessage.Should().Be(ErrorMessages.TableUnavailable);
+    }
+
     [Fact(DisplayName = "Upsert is unsuccessful")]
     public static async Task UpsertFails()
     {
@@ -23,6 +56,13 @@ public static class CommandTests
                     )
             )
             .ReturnsAsync(TestResponse.Fail("upsert failure"));
+        tableClient
+            .Setup(x => x.GetAccessPoliciesAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(
+                TestResponse<IReadOnlyList<TableSignedIdentifier>>.Success(
+                    new[] { It.IsAny<TableSignedIdentifier>() }
+                )
+            );
 
         var commandServiceClient = new Mock<TableServiceClient>();
         commandServiceClient.Setup(x => x.GetTableClient("products")).Returns(tableClient.Object);
@@ -60,6 +100,13 @@ public static class CommandTests
                     )
             )
             .ReturnsAsync(TestResponse.Success());
+        tableClient
+            .Setup(x => x.GetAccessPoliciesAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(
+                TestResponse<IReadOnlyList<TableSignedIdentifier>>.Success(
+                    new[] { It.IsAny<TableSignedIdentifier>() }
+                )
+            );
 
         var commandServiceClient = new Mock<TableServiceClient>();
         commandServiceClient.Setup(x => x.GetTableClient("products")).Returns(tableClient.Object);
@@ -97,6 +144,13 @@ public static class CommandTests
                     )
             )
             .ReturnsAsync(TestResponse.Success());
+        tableClient
+            .Setup(x => x.GetAccessPoliciesAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(
+                TestResponse<IReadOnlyList<TableSignedIdentifier>>.Success(
+                    new[] { It.IsAny<TableSignedIdentifier>() }
+                )
+            );
 
         var commandServiceClient = new Mock<TableServiceClient>();
         commandServiceClient.Setup(x => x.GetTableClient("products")).Returns(tableClient.Object);
@@ -134,6 +188,13 @@ public static class CommandTests
                     )
             )
             .ReturnsAsync(TestResponse.Fail("entity not found"));
+        tableClient
+            .Setup(x => x.GetAccessPoliciesAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(
+                TestResponse<IReadOnlyList<TableSignedIdentifier>>.Success(
+                    new[] { It.IsAny<TableSignedIdentifier>() }
+                )
+            );
 
         var commandServiceClient = new Mock<TableServiceClient>();
         commandServiceClient.Setup(x => x.GetTableClient("products")).Returns(tableClient.Object);
@@ -185,7 +246,7 @@ public static class CommandTests
             _ => new { ErrorCode = -1, ErrorMessage = string.Empty }
         };
 
-        response!.ErrorCode.Should().Be(ErrorCodes.CannotUpsert);
-        response.ErrorMessage.Should().Be(ErrorMessages.CannotUpsert);
+        response!.ErrorCode.Should().Be(ErrorCodes.Invalid);
+        response.ErrorMessage.Should().Be(ErrorMessages.EmptyOrNull);
     }
 }

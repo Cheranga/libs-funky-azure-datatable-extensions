@@ -92,7 +92,7 @@ async Task AddProductAsync()
     var productDataModel = ProductDataModel.New("TECH", "PROD1", 259.99d);
     var op = await commandService.UpsertAsync(
         category,
-        table,
+        "table",
         productDataModel,
         new CancellationToken()
     );
