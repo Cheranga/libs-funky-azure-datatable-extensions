@@ -344,7 +344,7 @@ public static class CommandExtensionTests
 
         (op.Operation is CommandOperation.CommandSuccessOperation).Should().BeTrue();
     }
-    
+
     [Theory(DisplayName = "Invalid category when updating")]
     [InlineData("")]
     [InlineData(null)]
