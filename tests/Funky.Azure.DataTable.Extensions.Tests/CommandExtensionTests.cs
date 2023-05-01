@@ -382,4 +382,45 @@ public static class CommandExtensionTests
         response.errorCode.Should().Be(ErrorCodes.Invalid);
         response.errorMessage.Should().Be(ErrorMessages.EmptyOrNull);
     }
+
+    [Fact(DisplayName = "Table service client name is not provided for update operation")]
+    public static async Task TableServiceClientNameIsNotProvidedForUpdate()
+    {
+        var factory = new Mock<IAzureClientFactory<TableServiceClient>>();
+        factory.Setup(x => x.CreateClient(Category)).Throws(new Exception("unavailable"));
+
+        var op = await CommandExtensions.UpdateAsync(
+            factory.Object,
+            Category,
+            Table,
+            GetValidProduct(),
+            new CancellationToken()
+        );
+
+        var response = GetErrorResponse(op);
+
+        response.errorCode.Should().Be(ErrorCodes.UnregisteredTableService);
+        response.errorMessage.Should().Be(ErrorMessages.UnregisteredTableService);
+    }
+
+    [Fact(DisplayName = "Table unavailable when updating")]
+    public static async Task TableUnavailableWhenUpdating()
+    {
+        var tableClient = GetTableClientWhenTableDoesNotExists();
+        var tableServiceClient = GetTableServiceClient(tableClient);
+        var factory = GetFactory(tableServiceClient);
+
+        var op = await CommandExtensions.UpdateAsync(
+            factory.Object,
+            Category,
+            Table,
+            GetValidProduct(),
+            new CancellationToken()
+        );
+
+        var response = GetErrorResponse(op);
+
+        response.errorCode.Should().Be(ErrorCodes.TableUnavailable);
+        response.errorMessage.Should().Be(ErrorMessages.TableUnavailable);
+    }
 }
