@@ -37,10 +37,8 @@ public static class QueryExtensions
                         await tc.GetEntityAsync<T>(partitionKey, rowKey, cancellationToken: token)
                 )
                 select op
-            )
-                .Match(GetSingle, GetError<T>)
-                .Run()
-        ).Match(op => op, GetError<T>);
+            ).Run()
+        ).Match(GetSingle, GetError<T>);
 
     public static async Task<
         QueryResponse<QueryFailedResult, EmptyResult, SingleResult<T>, CollectionResult<T>>
